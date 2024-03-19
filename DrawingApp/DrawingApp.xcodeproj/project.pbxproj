@@ -20,6 +20,8 @@
 		D61546642BA7D933003E375A /* Point.swift in Sources */ = {isa = PBXBuildFile; fileRef = D61546632BA7D933003E375A /* Point.swift */; };
 		D61546662BA7D94F003E375A /* RGBColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D61546652BA7D94F003E375A /* RGBColor.swift */; };
 		D615466A2BA7E7C4003E375A /* RectangleModelFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = D61546692BA7E7C4003E375A /* RectangleModelFactory.swift */; };
+		D615466C2BA8989F003E375A /* Opacity.swift in Sources */ = {isa = PBXBuildFile; fileRef = D615466B2BA8989F003E375A /* Opacity.swift */; };
+		D615466E2BA92ECF003E375A /* IDGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D615466D2BA92ECF003E375A /* IDGenerator.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -57,6 +59,8 @@
 		D61546632BA7D933003E375A /* Point.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Point.swift; sourceTree = "<group>"; };
 		D61546652BA7D94F003E375A /* RGBColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RGBColor.swift; sourceTree = "<group>"; };
 		D61546692BA7E7C4003E375A /* RectangleModelFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RectangleModelFactory.swift; sourceTree = "<group>"; };
+		D615466B2BA8989F003E375A /* Opacity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Opacity.swift; sourceTree = "<group>"; };
+		D615466D2BA92ECF003E375A /* IDGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IDGenerator.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -142,6 +146,7 @@
 				D61546612BA7D90F003E375A /* Size.swift */,
 				D61546632BA7D933003E375A /* Point.swift */,
 				D61546652BA7D94F003E375A /* RGBColor.swift */,
+				D615466B2BA8989F003E375A /* Opacity.swift */,
 			);
 			path = ShapeProperties;
 			sourceTree = "<group>";
@@ -151,6 +156,7 @@
 			children = (
 				D615465F2BA7D6E0003E375A /* RectangleModel.swift */,
 				D61546692BA7E7C4003E375A /* RectangleModelFactory.swift */,
+				D615466D2BA92ECF003E375A /* IDGenerator.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -287,10 +293,12 @@
 			files = (
 				D61546342BA7D07D003E375A /* DrawingViewController.swift in Sources */,
 				D61546622BA7D90F003E375A /* Size.swift in Sources */,
+				D615466E2BA92ECF003E375A /* IDGenerator.swift in Sources */,
 				D61546642BA7D933003E375A /* Point.swift in Sources */,
 				D61546662BA7D94F003E375A /* RGBColor.swift in Sources */,
 				D615466A2BA7E7C4003E375A /* RectangleModelFactory.swift in Sources */,
 				D61546602BA7D6E0003E375A /* RectangleModel.swift in Sources */,
+				D615466C2BA8989F003E375A /* Opacity.swift in Sources */,
 				D61546302BA7D07D003E375A /* AppDelegate.swift in Sources */,
 				D61546322BA7D07D003E375A /* SceneDelegate.swift in Sources */,
 			);

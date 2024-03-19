@@ -7,7 +7,11 @@
 
 import Foundation
 
-struct Point {
+struct Point: Equatable {
     var x: Double
     var y: Double
+    
+    static func == (lhs: Point, rhs: Point) -> Bool {
+        return lhs.x == rhs.x && lhs.y == rhs.y
+    }
 }

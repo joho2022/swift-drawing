@@ -6,31 +6,35 @@
 //
 
 import XCTest
+import os
 @testable import DrawingApp
 
 final class DrawingAppTests: XCTestCase {
-
-    override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
+    private let logger = Logger(subsystem: "pro.DrawingApp.Tests", category: "RectangleFactoryTests")
+    private var factory: RectangleFactory!
+    
+    override func setUp() {
+        super.setUp()
+        
+        self.factory = RectangleFactory()
     }
-
-    override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-    }
-
-    func testExample() throws {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-        // Any test you write for XCTest can be annotated as throws and async.
-        // Mark your test throws to produce an unexpected failure when your test encounters an uncaught error.
-        // Mark your test async to allow awaiting for asynchronous code to complete. Check the results with assertions afterwards.
-    }
-
-    func testPerformanceExample() throws {
-        // This is an example of a performance test case.
-        self.measure {
-            // Put the code you want to measure the time of here.
-        }
+    
+    func test_RectangleFactory() {
+        
+        let size = Size(width: 150, height: 120)
+        let point1 = Point(x: 10, y: 200)
+        let rgb1 = RGBColor(red: 245, green: 0, blue: 245)
+        let opacity1 = Opacity(value: 9)
+        
+        let rectangleModel = factory.createRectangleModel(size: size, point: point1, backgroundColor: rgb1!, opacity: opacity1!)
+        
+        XCTAssertNotNil(rectangleModel, "모델 객체 생성 실패")
+        XCTAssertEqual(rectangleModel.testable_size, size, "Size 속성 값 불일치")
+        XCTAssertEqual(rectangleModel.testable_point, point1, "Point 속성 값 불일치")
+        XCTAssertEqual(rectangleModel.testable_backgroundColor, rgb1, "rgb 속성 값 불일치")
+        XCTAssertEqual(rectangleModel.testable_opacity, opacity1, "Size 속성 값 불일치")
+        
+        logger.info("\(rectangleModel.description)")
     }
 
 }
