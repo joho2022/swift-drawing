@@ -7,17 +7,12 @@
 
 import Foundation
 
-struct Opacity: Equatable {
-    let value: Int
+enum Opacity: Int {
+    case one = 1, two, three, four, five, six, seven, eight, nine, ten
     
     init?(value: Int) {
-        guard (1...10).contains(value) else {
-            return nil
-        }
-        self.value = value
-    }
-    
-    static func == (lhs: Opacity, rhs: Opacity) -> Bool {
-        return lhs.value == rhs.value
+        self.init(rawValue: value)
     }
 }
+
+

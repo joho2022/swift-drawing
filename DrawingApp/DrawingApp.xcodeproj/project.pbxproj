@@ -22,6 +22,7 @@
 		D615466A2BA7E7C4003E375A /* RectangleModelFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = D61546692BA7E7C4003E375A /* RectangleModelFactory.swift */; };
 		D615466C2BA8989F003E375A /* Opacity.swift in Sources */ = {isa = PBXBuildFile; fileRef = D615466B2BA8989F003E375A /* Opacity.swift */; };
 		D615466E2BA92ECF003E375A /* IDGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D615466D2BA92ECF003E375A /* IDGenerator.swift */; };
+		D61546722BA952D3003E375A /* ClampedRGB.swift in Sources */ = {isa = PBXBuildFile; fileRef = D61546712BA952D3003E375A /* ClampedRGB.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -61,6 +62,7 @@
 		D61546692BA7E7C4003E375A /* RectangleModelFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RectangleModelFactory.swift; sourceTree = "<group>"; };
 		D615466B2BA8989F003E375A /* Opacity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Opacity.swift; sourceTree = "<group>"; };
 		D615466D2BA92ECF003E375A /* IDGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IDGenerator.swift; sourceTree = "<group>"; };
+		D61546712BA952D3003E375A /* ClampedRGB.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClampedRGB.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -145,6 +147,7 @@
 			children = (
 				D61546612BA7D90F003E375A /* Size.swift */,
 				D61546632BA7D933003E375A /* Point.swift */,
+				D61546712BA952D3003E375A /* ClampedRGB.swift */,
 				D61546652BA7D94F003E375A /* RGBColor.swift */,
 				D615466B2BA8989F003E375A /* Opacity.swift */,
 			);
@@ -294,6 +297,7 @@
 				D61546342BA7D07D003E375A /* DrawingViewController.swift in Sources */,
 				D61546622BA7D90F003E375A /* Size.swift in Sources */,
 				D615466E2BA92ECF003E375A /* IDGenerator.swift in Sources */,
+				D61546722BA952D3003E375A /* ClampedRGB.swift in Sources */,
 				D61546642BA7D933003E375A /* Point.swift in Sources */,
 				D61546662BA7D94F003E375A /* RGBColor.swift in Sources */,
 				D615466A2BA7E7C4003E375A /* RectangleModelFactory.swift in Sources */,

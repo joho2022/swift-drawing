@@ -8,8 +8,8 @@
 import Foundation
 
 struct Size: Equatable {
-    var width: Double
-    var height: Double
+    private(set) var width: Double
+    private(set) var height: Double
     
     static func == (lhs: Size, rhs: Size) -> Bool {
         return lhs.width == rhs.width && lhs.height == rhs.height

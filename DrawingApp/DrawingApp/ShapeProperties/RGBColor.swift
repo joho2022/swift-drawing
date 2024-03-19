@@ -8,9 +8,9 @@
 import Foundation
 
 struct RGBColor: Equatable {
-    var red: Int
-    var green: Int
-    var blue: Int
+    private(set) var red: Int
+    private(set) var green: Int
+    private(set) var blue: Int
     
     init?(red: Int, green: Int, blue: Int) {
         guard (0...255).contains(red),
