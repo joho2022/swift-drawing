@@ -7,14 +7,18 @@
 
 import Foundation
 
+struct UniqueID: Hashable {
+    private(set) var value: String
+}
+
 class IDGenerator {
-    private var existingIDs = Set<String>()
+    private var existingIDs = Set<UniqueID>()
     private let characters = "abcdefghijklmnopqrstuvwxyz0123456789"
     
-    func generateUniqueRandomID() -> String {
-        var uniqueID: String
+    func generateUniqueRandomID() -> UniqueID {
+        var uniqueID: UniqueID
         repeat {
-            uniqueID = generateRandomID()
+            uniqueID = UniqueID(value: generateRandomID())
         } while existingIDs.contains(uniqueID)
         
         existingIDs.insert(uniqueID)

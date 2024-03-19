@@ -8,8 +8,8 @@
 import Foundation
 
 struct Point: Equatable {
-    var x: Double
-    var y: Double
+    private(set) var x: Double
+    private(set) var y: Double
     
     static func == (lhs: Point, rhs: Point) -> Bool {
         return lhs.x == rhs.x && lhs.y == rhs.y
