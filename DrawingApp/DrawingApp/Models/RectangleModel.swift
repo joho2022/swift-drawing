@@ -21,6 +21,13 @@ class RectangleModel {
         self.backgroundColor = backgroundColor
         self.opacity = opacity
     }
+    
+    func contains(_ point: Point) -> Bool {
+        let horizontalRange = point.x..<(point.x + size.width)
+        let verticalRange = point.y..<(point.y + size.height)
+        
+        return horizontalRange.contains(point.x) && verticalRange.contains(point.y)
+    }
 }
 
 extension RectangleModel: CustomStringConvertible {

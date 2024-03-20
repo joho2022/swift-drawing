@@ -23,6 +23,15 @@
 		D615466C2BA8989F003E375A /* Opacity.swift in Sources */ = {isa = PBXBuildFile; fileRef = D615466B2BA8989F003E375A /* Opacity.swift */; };
 		D615466E2BA92ECF003E375A /* IDGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D615466D2BA92ECF003E375A /* IDGenerator.swift */; };
 		D61546722BA952D3003E375A /* ClampedRGB.swift in Sources */ = {isa = PBXBuildFile; fileRef = D61546712BA952D3003E375A /* ClampedRGB.swift */; };
+		D61546742BA9C13A003E375A /* Plane.swift in Sources */ = {isa = PBXBuildFile; fileRef = D61546732BA9C13A003E375A /* Plane.swift */; };
+		D61546762BA9F61A003E375A /* DrawableButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = D61546752BA9F61A003E375A /* DrawableButton.swift */; };
+		D61546782BAA0866003E375A /* DrawableButtonStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = D61546772BAA0866003E375A /* DrawableButtonStack.swift */; };
+		D615467B2BAA0BF8003E375A /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = D615467A2BAA0BF8003E375A /* SnapKit */; };
+		D615467D2BAA730A003E375A /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D615467C2BAA730A003E375A /* MainViewController.swift */; };
+		D615467F2BAA734E003E375A /* SettingsPanelViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D615467E2BAA734E003E375A /* SettingsPanelViewController.swift */; };
+		D61546812BAA7697003E375A /* CGRect+.swift in Sources */ = {isa = PBXBuildFile; fileRef = D61546802BAA7697003E375A /* CGRect+.swift */; };
+		D61546852BAA7D75003E375A /* BackgroundStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = D61546842BAA7D75003E375A /* BackgroundStack.swift */; };
+		D61546872BAA8880003E375A /* OpacityStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = D61546862BAA8880003E375A /* OpacityStack.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -63,6 +72,14 @@
 		D615466B2BA8989F003E375A /* Opacity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Opacity.swift; sourceTree = "<group>"; };
 		D615466D2BA92ECF003E375A /* IDGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IDGenerator.swift; sourceTree = "<group>"; };
 		D61546712BA952D3003E375A /* ClampedRGB.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClampedRGB.swift; sourceTree = "<group>"; };
+		D61546732BA9C13A003E375A /* Plane.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Plane.swift; sourceTree = "<group>"; };
+		D61546752BA9F61A003E375A /* DrawableButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrawableButton.swift; sourceTree = "<group>"; };
+		D61546772BAA0866003E375A /* DrawableButtonStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrawableButtonStack.swift; sourceTree = "<group>"; };
+		D615467C2BAA730A003E375A /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
+		D615467E2BAA734E003E375A /* SettingsPanelViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsPanelViewController.swift; sourceTree = "<group>"; };
+		D61546802BAA7697003E375A /* CGRect+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGRect+.swift"; sourceTree = "<group>"; };
+		D61546842BAA7D75003E375A /* BackgroundStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundStack.swift; sourceTree = "<group>"; };
+		D61546862BAA8880003E375A /* OpacityStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpacityStack.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,6 +87,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D615467B2BAA0BF8003E375A /* SnapKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -115,9 +133,14 @@
 			children = (
 				D615462F2BA7D07D003E375A /* AppDelegate.swift */,
 				D61546312BA7D07D003E375A /* SceneDelegate.swift */,
+				D615467C2BAA730A003E375A /* MainViewController.swift */,
+				D61546752BA9F61A003E375A /* DrawableButton.swift */,
+				D61546772BAA0866003E375A /* DrawableButtonStack.swift */,
 				D61546332BA7D07D003E375A /* DrawingViewController.swift */,
+				D61546832BAA7D5A003E375A /* Settings */,
 				D61546682BA7DDE7003E375A /* Models */,
 				D61546672BA7DDDF003E375A /* ShapeProperties */,
+				D61546822BAA769F003E375A /* Extension */,
 				D61546382BA7D07E003E375A /* Assets.xcassets */,
 				D615463A2BA7D07E003E375A /* LaunchScreen.storyboard */,
 				D615463D2BA7D07E003E375A /* Info.plist */,
@@ -160,8 +183,27 @@
 				D615465F2BA7D6E0003E375A /* RectangleModel.swift */,
 				D61546692BA7E7C4003E375A /* RectangleModelFactory.swift */,
 				D615466D2BA92ECF003E375A /* IDGenerator.swift */,
+				D61546732BA9C13A003E375A /* Plane.swift */,
 			);
 			path = Models;
+			sourceTree = "<group>";
+		};
+		D61546822BAA769F003E375A /* Extension */ = {
+			isa = PBXGroup;
+			children = (
+				D61546802BAA7697003E375A /* CGRect+.swift */,
+			);
+			path = Extension;
+			sourceTree = "<group>";
+		};
+		D61546832BAA7D5A003E375A /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				D615467E2BAA734E003E375A /* SettingsPanelViewController.swift */,
+				D61546842BAA7D75003E375A /* BackgroundStack.swift */,
+				D61546862BAA8880003E375A /* OpacityStack.swift */,
+			);
+			path = Settings;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -180,6 +222,9 @@
 			dependencies = (
 			);
 			name = DrawingApp;
+			packageProductDependencies = (
+				D615467A2BAA0BF8003E375A /* SnapKit */,
+			);
 			productName = DrawingApp;
 			productReference = D615462C2BA7D07D003E375A /* DrawingApp.app */;
 			productType = "com.apple.product-type.application";
@@ -252,6 +297,9 @@
 				Base,
 			);
 			mainGroup = D61546232BA7D07D003E375A;
+			packageReferences = (
+				D61546792BAA0BF8003E375A /* XCRemoteSwiftPackageReference "SnapKit" */,
+			);
 			productRefGroup = D615462D2BA7D07D003E375A /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -294,16 +342,24 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D61546872BAA8880003E375A /* OpacityStack.swift in Sources */,
 				D61546342BA7D07D003E375A /* DrawingViewController.swift in Sources */,
 				D61546622BA7D90F003E375A /* Size.swift in Sources */,
 				D615466E2BA92ECF003E375A /* IDGenerator.swift in Sources */,
+				D61546762BA9F61A003E375A /* DrawableButton.swift in Sources */,
+				D615467F2BAA734E003E375A /* SettingsPanelViewController.swift in Sources */,
 				D61546722BA952D3003E375A /* ClampedRGB.swift in Sources */,
 				D61546642BA7D933003E375A /* Point.swift in Sources */,
 				D61546662BA7D94F003E375A /* RGBColor.swift in Sources */,
 				D615466A2BA7E7C4003E375A /* RectangleModelFactory.swift in Sources */,
+				D61546812BAA7697003E375A /* CGRect+.swift in Sources */,
 				D61546602BA7D6E0003E375A /* RectangleModel.swift in Sources */,
+				D615467D2BAA730A003E375A /* MainViewController.swift in Sources */,
 				D615466C2BA8989F003E375A /* Opacity.swift in Sources */,
 				D61546302BA7D07D003E375A /* AppDelegate.swift in Sources */,
+				D61546852BAA7D75003E375A /* BackgroundStack.swift in Sources */,
+				D61546742BA9C13A003E375A /* Plane.swift in Sources */,
+				D61546782BAA0866003E375A /* DrawableButtonStack.swift in Sources */,
 				D61546322BA7D07D003E375A /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -643,6 +699,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		D61546792BAA0BF8003E375A /* XCRemoteSwiftPackageReference "SnapKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SnapKit/SnapKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.7.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		D615467A2BAA0BF8003E375A /* SnapKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D61546792BAA0BF8003E375A /* XCRemoteSwiftPackageReference "SnapKit" */;
+			productName = SnapKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = D61546242BA7D07D003E375A /* Project object */;
 }
