@@ -12,8 +12,11 @@ import os
 class SettingsPanelViewController: UIViewController {
     private let logger = os.Logger(subsystem: "pro.DrawingApp.model", category: "BackgroundStack")
     
-    private let backgroundStack = BackgroundStack()
-    private let opacityStack = OpacityStack()
+    private(set) var backgroundStack = BackgroundStack()
+    private(set) var opacityStack = OpacityStack()
+    
+    var onColorChangeRequested: (() -> Void)?
+    var onOpacityChangeRequested: ((Opacity) -> Void)?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -54,6 +57,7 @@ extension SettingsPanelViewController {
     }
     
     @objc func changeColorTapped() {
+        onColorChangeRequested?()
         logger.info("배경색 버튼 Tapped!!!")
     }
     
@@ -61,14 +65,6 @@ extension SettingsPanelViewController {
         guard let opacity = Opacity(value: Int(sender.value)) else {
             return
         }
-        
-        updateOpacity(opacity)
+        onOpacityChangeRequested?(opacity)
     }
-    
-    private func updateOpacity(_ opacity: Opacity) {
-        let alphaValue = CGFloat(opacity.rawValue) / 10.0
-        
-        logger.info("선택한 투명도: \(opacity.rawValue), Alpha 값: \(Double(opacity.rawValue) / 10.0)")
-    }
-   
 }

@@ -42,6 +42,10 @@ class BackgroundStack: UIStackView {
         setupStackView()
     }
     
+    func updateColorButtonTitle(_ title: String) {
+        changeColorButton.setTitle(title, for: .normal)
+    }
+    
     private func setupStackView() {
         axis = .vertical
         distribution = .fillEqually

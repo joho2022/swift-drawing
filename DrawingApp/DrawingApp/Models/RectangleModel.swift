@@ -8,7 +8,7 @@
 import Foundation
 
 class RectangleModel {
-    private let uniqueID: UniqueID
+    private(set) var uniqueID: UniqueID
     private(set) var size: Size
     private(set) var point: Point
     private(set) var backgroundColor: RGBColor
@@ -23,10 +23,18 @@ class RectangleModel {
     }
     
     func contains(_ point: Point) -> Bool {
-        let horizontalRange = point.x..<(point.x + size.width)
-        let verticalRange = point.y..<(point.y + size.height)
+        let horizontalRange = self.point.x..<(self.point.x + self.size.width)
+        let verticalRange = self.point.y..<(self.point.y + self.size.height)
         
         return horizontalRange.contains(point.x) && verticalRange.contains(point.y)
+    }
+    
+    func setBackgroundColor(_ newColor: RGBColor) {
+        return self.backgroundColor = newColor
+    }
+    
+    func setOpacity(_ newOpacity: Opacity) {
+        return self.opacity = newOpacity
     }
 }
 

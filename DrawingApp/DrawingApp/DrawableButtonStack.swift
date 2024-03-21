@@ -31,12 +31,14 @@ class DrawableButtonStack: UIStackView {
         [ rectangleButton, photoButton ].forEach { addArrangedSubview($0) }
     }
     
-    func setButtonActions(rectangleAction: Selector?, photoAction: Selector?, target: Any?) {
-        if let action = rectangleAction {
+    func setRectangleButtonAction(_ action: Selector?, target: Any?) {
+        if let action = action {
             rectangleButton.addTarget(target, action: action, for: .touchUpInside)
         }
-        
-        if let action = photoAction {
+    }
+
+    func setPhotoButtonAction(_ action: Selector?, target: Any?) {
+        if let action = action {
             photoButton.addTarget(target, action: action, for: .touchUpInside)
         }
     }
