@@ -26,17 +26,20 @@ class DrawableButtonStack: UIStackView {
     private func setupStackView() {
         axis = .horizontal
         distribution = .fillEqually
-        spacing = 5 
+        spacing = 5
         
         [ rectangleButton, photoButton ].forEach { addArrangedSubview($0) }
     }
     
+    // action에 nil을 주고 일시적으로 동작하지 않도록 생각한 방법
     func setRectangleButtonAction(_ action: Selector?, target: Any?) {
         if let action = action {
             rectangleButton.addTarget(target, action: action, for: .touchUpInside)
+        } else {
+            rectangleButton.removeTarget(nil, action: nil, for: .touchUpInside)
         }
     }
-
+    
     func setPhotoButtonAction(_ action: Selector?, target: Any?) {
         if let action = action {
             photoButton.addTarget(target, action: action, for: .touchUpInside)
