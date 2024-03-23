@@ -9,11 +9,17 @@ import UIKit
 import os
 import SnapKit
 
+extension Notification.Name {
+    static let rectangleCreated = Notification.Name("rectangleCreated")
+    static let rectangleColorChanged = Notification.Name("rectangleColorChanged")
+    static let rectangleOpacityChanged = Notification.Name("rectangleOpacityChanged")
+}
+
 class MainViewController: UIViewController {
     private let logger = os.Logger(subsystem: "pro.DrawingApp.model", category: "Main")
     private var selectedRectangleView: UIView?
-    
-    private let factory = RectangleFactory()
+    private var rectangleViews: [String: UIView] = [:]
+
     private var plane = Plane()
     
     private let drawableButtonStack = DrawableButtonStack()
@@ -30,6 +36,10 @@ class MainViewController: UIViewController {
         setupOpacityAction()
         setupBackgroundAction()
         setupView()
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(handleCreateRectangle(notification:)), name: .rectangleCreated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleColorChanged(notification:)), name: .rectangleColorChanged, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleOpacityChanged(notification:)), name: .rectangleOpacityChanged, object: nil)
     }
     
     private func addChild(_ child: UIViewController, _ frame: CGRect) {
@@ -57,22 +67,8 @@ extension MainViewController {
     }
     
     @objc private func rectangleButtonTapped() {
-        let size = Size(width: 150.0, height: 120.0)
-        let subViewWidth = settingsPanelViewController.view.bounds.width
-        let randomPoint = Point(x: Double.random(in: 0...(view.bounds.width - size.width - subViewWidth)), y: Double.random(in: 0...(view.bounds.height - size.height)))
-        let randomColor = RGBColor(red: Int.random(in: 0...255), green: Int.random(in: 0...255), blue: Int.random(in: 0...255))!
-        let opacity = Opacity(value: 10)!
-        
-        let rect = factory.createRectangleModel(size: size, point: randomPoint, backgroundColor: randomColor, opacity: opacity)
-        plane.addRectangle(rect)
-        
-        let rectView = UIView(frame: CGRect(x: rect.point.x, y: rect.point.y, width: rect.size.width, height: rect.size.height))
-        rectView.backgroundColor = UIColor(red: CGFloat(randomColor.red) / 255.0, green: CGFloat(randomColor.green) / 255.0, blue: CGFloat(randomColor.blue) / 255.0, alpha: CGFloat(opacity.rawValue) / 10.0)
-        rectView.tag = rect.uniqueID.hashValue
-        
-        view.addSubview(rectView)
-        
-        logger.info("사각형 버튼 Tapped!!")
+        logger.info("사각형 생성 명령하달!!")
+        NotificationCenter.default.post(name: .rectangleCreated, object: nil)
     }
     
     @objc private func photoButtonTapped() {
@@ -88,7 +84,7 @@ extension MainViewController {
             selectedRectangleView?.layer.borderWidth = 0
             
             selectedRectangleView = rectangleView
-            selectedRectangleView?.layer.borderWidth = 2
+            selectedRectangleView?.layer.borderWidth = 4
             selectedRectangleView?.layer.borderColor = UIColor.blue.cgColor
             
             logger.info("선택된 사각형의 ID는 \(rectangleModel.uniqueID.value)")
@@ -99,8 +95,35 @@ extension MainViewController {
         }
     }
     
-    private func findRectangleView(for model: RectangleModel) -> UIView? {
-        return view.subviews.first { $0.tag == model.uniqueID.hashValue }
+    @objc private func handleCreateRectangle(notification: Notification) {
+        let rectangleModel = plane.createRectangleData()
+        let rectangleView = plane.createRectangleView(rectangleModel)
+        
+        logger.info("사각형 생성 수신완료!!")
+        addRectangleViews(for: rectangleView, with: rectangleModel)
+        view.bringSubviewToFront(drawableButtonStack)
+    }
+    
+    @objc private func handleColorChanged(notification: Notification) {
+        guard let userInfo = notification.userInfo,
+              let uniqueID = userInfo["uniqueID"] as? String,
+              let randomColor = userInfo["randomColor"] as? RGBColor,
+              let rectangleView = rectangleViews[uniqueID] else { return }
+        
+        self.logger.info("배경색 변경 수신완료!")
+        updateViewBackgroundColor(for: rectangleView, using: randomColor)
+        updateColorButtonTitle(with: randomColor)
+        
+    }
+    
+    @objc private func handleOpacityChanged(notification: Notification) {
+        guard let userInfo = notification.userInfo,
+              let uniqueID = userInfo["uniqueID"] as? String,
+              let newOpacity = userInfo["opacity"] as? Opacity,
+              let rectangleView = rectangleViews[uniqueID] else { return }
+        
+        updateViewOpacity(for: rectangleView, using: newOpacity)
+        logger.info("투명도 변경 수신완료! 투명도: \(Double(newOpacity.rawValue) / 10.0)")
     }
     
     private func setupBackgroundAction() {
@@ -110,19 +133,8 @@ extension MainViewController {
                 self?.logger.error("선택된 사각형이 없습니다.")
                 return
             }
-            
-            let randomColor = RGBColor(red: Int.random(in: 0...255), green: Int.random(in: 0...255), blue: Int.random(in: 0...255))!
-            let rectangleModel = plane.rectangles.first { $0.uniqueID.hashValue ==  selectedRectangleView.tag }
-            
-            rectangleModel?.setBackgroundColor(randomColor)
-            
-            selectedRectangleView.backgroundColor = UIColor(red: CGFloat(randomColor.red) / 255.0, green: CGFloat(randomColor.green) / 255.0, blue: CGFloat(randomColor.blue) / 255.0, alpha:  CGFloat((rectangleModel?.opacity.rawValue)!) / 10.0 )
-            
-            let hexString = String(format: "%02X%02X%02X", randomColor.red, randomColor.green, randomColor.blue)
-            
-            self.settingsPanelViewController.backgroundStack.updateColorButtonTitle(hexString)
-            
-            self.logger.info("배경색이 변경되었습니다.")
+            let uniqueID = findKey(for: selectedRectangleView)!
+            plane.updateRectangleColor(uniqueID: uniqueID)
         }
     }
     
@@ -133,13 +145,43 @@ extension MainViewController {
                 self?.logger.error("선택된 사각형이 없습니다.")
                 return
             }
-            
-            let rectangleModel = plane.rectangles.first { $0.uniqueID.hashValue == selectedRectangleView.tag }
-            
-            rectangleModel?.setOpacity(newOpacity)
-            
-            selectedRectangleView.alpha = CGFloat(newOpacity.rawValue) / 10.0
-            logger.info("변경된 투명도는 \(Double(newOpacity.rawValue) / 10.0)")
+            let uniqueID = findKey(for: selectedRectangleView)!
+            plane.updateRectangleOpacity(uniqueID: uniqueID, opacity: newOpacity)
         }
+    }
+    
+    private func addRectangleViews(for view: UIView, with model: RectangleModel) {
+        rectangleViews[model.uniqueID.value] = view
+        
+        logger.info("생성된 키는\(self.rectangleViews.keys)")
+        self.view.addSubview(view)
+    }
+    
+    private func findRectangleView(for model: RectangleModel) -> UIView? {
+        return rectangleViews[model.uniqueID.value]
+    }
+    
+    private func findKey(for view: UIView) -> String? {
+        return rectangleViews.first(where: { $0.value === view })?.key
+    }
+    
+    private func updateViewBackgroundColor(for view: UIView, using color: RGBColor) {
+        let backgroundColor = UIColor(
+            red: CGFloat(color.red) / 255.0,
+            green: CGFloat(color.green) / 255.0,
+            blue: CGFloat(color.blue) / 255.0,
+            alpha: 10.0
+        )
+        
+        view.backgroundColor = backgroundColor
+    }
+    
+    private func updateViewOpacity(for view: UIView, using opacity: Opacity) {
+        view.alpha = CGFloat(opacity.rawValue) / 10.0
+    }
+    
+    private func updateColorButtonTitle(with color: RGBColor) {
+        let hexString = String(format: "%02X%02X%02X", color.red, color.green, color.blue)
+        self.settingsPanelViewController.backgroundStack.updateColorButtonTitle(hexString)
     }
 }
