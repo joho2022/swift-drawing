@@ -325,3 +325,134 @@ init으로 생성하면 인스턴스를 생성하는 순간 구성요소가 설�
 
 </div>
 </details>
+
+<details>
+<summary>관찰자 패턴</summary>
+
+## 🎯주요 작업
+
+- [x]  Model과 Controller의 직접적인 참조 관계 끊기
+- [x]  NotificationCenter , Observer 프로젝트에 적용
+
+## 📚학습 키워드
+
+### Observer 패턴
+
+모델은 자신이 상태가 변경되면 옵저버 등록된 객체에게 알려주고, 컨트롤러는 수신완료하여 필요한 반응을 할 수 있다.
+
+### NotificationCenter
+
+Notification이 오면 옵저버 패턴을 통해서 등록된 옵저버에게 Notification을 전달하기 위해 사용하는 클래스.
+
+- 싱글톤 객체중 하나이며, 이벤트들의 발생 여부를 옵저버를 등록한 객체에게 Notification을 post하는 방식으로 사용
+- post메서드를 통해 Notification을 전달하는데 이때, 이벤트에 대한 정보를 담은 객체이다.
+- 각 알림은 Notification.Name이 있으며, 이를 통해 어떤 이벤트에 대한 알림인지 구분할 수 있다.
+- 이름을 통해 알림 구독과 전달할 때 사용되는 Key값이다.
+
+### Notification
+
+- name : 전달하고자 하는 알림이름 (이를 통해 식별함)
+- object : 발송자가 옵저버에게 보내려는 객체, 주로 발송자 객체를 전달하는데 쓰임
+- userInfo : 알림과 관련된 값, 객체의 저장소이다 추가적인 데이터를 보내는데 쓰임
+
+### 1. extension으로 [Notification.Name](http://Notification.Name) 추가하기
+
+```swift
+// Main뷰컨트롤러
+extension Notification.Name {
+    static let rectangleCreated = Notification.Name("rectangleCreated")
+    static let rectangleColorChanged = Notification.Name("rectangleColorChanged")
+    static let rectangleOpacityChanged = Notification.Name("rectangleOpacityChanged")
+}
+```
+
+### 2. Notification Center에 옵저버 등록하기
+
+```swift
+// Main뷰컨트롤러
+override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(handleCreateRectangle(notification:)), name: .rectangleCreated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleColorChanged(notification:)), name: .rectangleColorChanged, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleOpacityChanged(notification:)), name: .rectangleOpacityChanged, object: nil)
+    }
+    
+    
+    @objc private func handleCreateRectangle(notification: Notification) {
+        let rectangleModel = plane.createRectangleData()
+        let rectangleView = plane.createRectangleView(rectangleModel)
+        
+        addRectangleViews(for: rectangleView, with: rectangleModel)
+        view.bringSubviewToFront(drawableButtonStack)
+        
+        logger.info("사각형 생성 수신완료!!")
+    }
+    
+    @objc private func handleColorChanged(notification: Notification) {
+        guard let userInfo = notification.userInfo,
+              let uniqueID = userInfo["uniqueID"] as? String,
+              let randomColor = userInfo["randomColor"] as? RGBColor,
+              let rectangleView = rectangleViews[uniqueID] else { return }
+        
+        updateViewBackgroundColor(for: rectangleView, using: randomColor)
+        updateColorButtonTitle(with: randomColor)
+        
+        self.logger.info("배경색 변경 수신완료!")
+    }
+    
+    @objc private func handleOpacityChanged(notification: Notification) {
+        guard let userInfo = notification.userInfo,
+              let uniqueID = userInfo["uniqueID"] as? String,
+              let newOpacity = userInfo["opacity"] as? Opacity,
+              let rectangleView = rectangleViews[uniqueID] else { return }
+        
+        updateViewOpacity(for: rectangleView, using: newOpacity)
+        logger.info("투명도 변경 수신완료! 투명도: \(Double(newOpacity.rawValue) / 10.0)")
+    }
+```
+
+### 3. NotificationCenter에 Post하기
+
+```swift
+ // Plane 객체
+ mutating func updateRectangleColor(uniqueID: String) {
+        let randomColor = getRandomColor()
+        
+        if let index = rectangles.firstIndex(where: { $0.uniqueID.value == uniqueID }) {
+            rectangles[index].setBackgroundColor(randomColor)
+            
+            self.logger.info("배경색 변경 명령하달!")
+            NotificationCenter.default.post(name: .rectangleColorChanged, object: nil, userInfo: ["uniqueID": uniqueID, "randomColor": randomColor])
+        }
+    }
+```
+
+## 💻고민과 해결
+
+### 사각형을 생성하면 버튼위에 사각형이 생성되어서 버튼이 가려지는 현상
+
+→ `bringSubviewToFront(_:)` 를 사용해서 사각형 생성될때마다 버튼스택뷰를 최상단으로 설정한다.
+
+<img width="1095" alt="스크린샷 2024-03-22 오후 5 23 53" src="https://github.com/codesquad-members-2024/swift-drawing/assets/104732020/f2780290-618b-450a-8905-7342f64d27d6">
+
+### Tag값으로 subViews에 찾는 방법을 지양하고 다른 데이터 구조 모색
+
+뷰 인스턴스 자체를 비교하기 위해 키값을 유니크ID value를 뷰 인스턴스로 딕셔너리를 만듬
+
+## 🤔결과
+
+![스텝3](https://github.com/codesquad-members-2024/swift-drawing/assets/104732020/92538af0-8947-4c4c-9e5a-f451a03d0894)
+
+## 📚추가학습
+
+### 느슨하게 연결된 (loosed coupled) 구조가 왜 좋은가?
+
+두 객체가 느슨하게 연결되어 있다는 것은 상호작용은 하지만, 서로에 대해 잘 모른다는 것을 의미한다.
+
+그래서 서로 의존성이 줄어들어서 나중에 변경사항이 생기면 유연하게 유지보수를 할 수 있다.
+
+즉, 객체지향 시스템을 유연하게 구축할 수 있다. → 객체 사이의 상호의존성을 최소화하기 때문에
+
+</div>
+</details>
