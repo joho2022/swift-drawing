@@ -9,18 +9,13 @@ import UIKit
 import os
 import SnapKit
 
-extension Notification.Name {
-    static let rectangleCreated = Notification.Name("rectangleCreated")
-    static let rectangleColorChanged = Notification.Name("rectangleColorChanged")
-    static let rectangleOpacityChanged = Notification.Name("rectangleOpacityChanged")
-}
-
 class MainViewController: UIViewController {
     private let logger = os.Logger(subsystem: "pro.DrawingApp.model", category: "Main")
     private var selectedRectangleView: UIView?
     private var rectangleViews: [String: UIView] = [:]
 
     private var plane = Plane()
+    private var factory = RectangleFactory()
     
     private let drawableButtonStack = DrawableButtonStack()
     private let settingsPanelViewController = SettingsPanelViewController()
@@ -67,8 +62,8 @@ extension MainViewController {
     }
     
     @objc private func rectangleButtonTapped() {
-        logger.info("사각형 생성 명령하달!!")
-        NotificationCenter.default.post(name: .rectangleCreated, object: nil)
+        let rectangleModel = createRectangleData()
+        plane.createRectangleView(rectangleModel)
     }
     
     @objc private func photoButtonTapped() {
@@ -96,11 +91,12 @@ extension MainViewController {
     }
     
     @objc private func handleCreateRectangle(notification: Notification) {
-        let rectangleModel = plane.createRectangleData()
-        let rectangleView = plane.createRectangleView(rectangleModel)
+        guard let userInfo = notification.userInfo,
+              let rectModel = userInfo["rectModel"] as? RectangleModel,
+              let rectView = userInfo["rectView"] as? UIView else { return }
         
         logger.info("사각형 생성 수신완료!!")
-        addRectangleViews(for: rectangleView, with: rectangleModel)
+        addRectangleViews(for: rectView, with: rectModel)
         view.bringSubviewToFront(drawableButtonStack)
     }
     
@@ -183,5 +179,19 @@ extension MainViewController {
     private func updateColorButtonTitle(with color: RGBColor) {
         let hexString = String(format: "%02X%02X%02X", color.red, color.green, color.blue)
         self.settingsPanelViewController.backgroundStack.updateColorButtonTitle(hexString)
+    }
+    
+    private func createRectangleData() -> RectangleModel {
+        let size = Size(width: 150.0, height: 120.0)
+        let subViewWidth = 200.0
+        let randomPoint = Point(x: Double.random(in: 0...(view.bounds.width - size.width - subViewWidth)), y: Double.random(in: 0...(view.bounds.height - size.height)))
+        let randomColor = RGBColor(red: Int.random(in: 0...255), green: Int.random(in: 0...255), blue: Int.random(in: 0...255))!
+        let opacity = Opacity(value: 10)!
+        
+        let rect = factory.createRectangleModel(size: size, point: randomPoint, backgroundColor: randomColor, opacity: opacity)
+        
+        plane.addRectangle(rect)
+        
+        return rect
     }
 }

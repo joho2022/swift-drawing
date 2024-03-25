@@ -31,31 +31,17 @@ struct Plane {
         return nil
     }
     
-    mutating func createRectangleData() -> RectangleModel {
-        let mainViewController = MainViewController()
-        let factory = RectangleFactory()
+    func createRectangleView(_ data: RectangleModel) {
+        let rectModel = data
+        let rectView = UIView(frame: CGRect(x: rectModel.point.x, y: rectModel.point.y, width: rectModel.size.width, height: rectModel.size.height))
+        rectView.backgroundColor = UIColor(red: CGFloat(rectModel.backgroundColor.red) / 255.0, green: CGFloat(rectModel.backgroundColor.green) / 255.0, blue: CGFloat(rectModel.backgroundColor.blue) / 255.0, alpha: CGFloat(rectModel.opacity.rawValue) / 10.0)
         
-        let size = Size(width: 150.0, height: 120.0)
-        let subViewWidth = 200.0
-        let randomPoint = Point(x: Double.random(in: 0...(mainViewController.view.bounds.width - size.width - subViewWidth)), y: Double.random(in: 0...(mainViewController.view.bounds.height - size.height)))
-        let randomColor = RGBColor(red: Int.random(in: 0...255), green: Int.random(in: 0...255), blue: Int.random(in: 0...255))!
-        let opacity = Opacity(value: 10)!
+        logger.info("사각형 생성 명령하달!!")
+        NotificationCenter.default.post(name: .rectangleCreated, object: nil, userInfo: ["rectModel": rectModel, "rectView": rectView])
         
-        let rect = factory.createRectangleModel(size: size, point: randomPoint, backgroundColor: randomColor, opacity: opacity)
-        
-        addRectangle(rect)
-        
-        return rect
     }
     
-    func createRectangleView(_ data: RectangleModel) -> UIView {
-        let rectView = UIView(frame: CGRect(x: data.point.x, y: data.point.y, width: data.size.width, height: data.size.height))
-        rectView.backgroundColor = UIColor(red: CGFloat(data.backgroundColor.red) / 255.0, green: CGFloat(data.backgroundColor.green) / 255.0, blue: CGFloat(data.backgroundColor.blue) / 255.0, alpha: CGFloat(data.opacity.rawValue) / 10.0)
-        
-        return rectView
-    }
-    
-    private mutating func addRectangle(_ rectangle: RectangleModel) {
+    mutating func addRectangle(_ rectangle: RectangleModel) {
         rectangles.append(rectangle)
     }
     
