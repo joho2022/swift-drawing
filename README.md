@@ -456,3 +456,86 @@ override func viewDidLoad() {
 
 </div>
 </details>
+
+<details>
+<summary>사진 추가하기</summary>
+
+## 🎯주요 작업
+
+- [x]  사진 추가하기 동작
+    - [x]  터치가 될때마다 사진이 있으면 선택, 빈영역을 선택할 경우 선택취소
+    - [x]  선택되면 테두리에 선을 표시
+    - [x]  배경색 지원 X, 투명도만 지원
+- [x]  사진 불러오기
+    - [x]  앨범에서 원하는 사진을 선택가능
+    - [x]  불러온 사진은 바이너리 형태로 메모리에서만 데이터관리한다.
+    - [x]  화면에 추가한 뷰 이외에 사진 데이터만 관리하는 모델타입을 선언한다.
+
+## 📚학습 키워드
+
+### URL
+
+Uniform Resource Locator 자원을 가리키는 주소
+
+모든 자원은 각각 고유한 URL을 가지고 있으며, 이를 통해 해당 자원에 접근할 수 있음.
+
+### ImageView - 두번째 미션 1일차, 첫번째 미션 5일차
+
+- **UIImageView**는 내부적으로 하나의 **UIImage**를 관리하는 뷰
+- **UIImage**는 이미지 데이터를 나타내는 객체
+- 이미지 뷰 속성들
+
+### PhotoPicker  - 첫번째 미션 5일차
+
+- 사용자의 미디어를 선택할 수 있는 뷰 컨트롤러
+- **UIImagePickerController**
+- **PHPickerViewController (iOS 14이상 권장) 최신**
+
+1. 인스턴스 생성
+2. 델리게이트 설정 
+3. **present**
+
+## 💻고민과 해결
+
+### 1. 사진 추가할 때 입력-처리-출력을 구분하도록 노력하였습니다.
+
+### 2. plane 모델과 photo모델의 공통된 동작이 보여서 추상화해야겠다고 생각했습니다. (ISP원칙 의도하도록 노력)
+
+### Notification을 보내는 객체와 받는 객체 중에 어떤 객체와 더 관련이 높을까?
+
+저는 보내는 객체가 더 관련성이 높다고 생각합니다.
+
+물론 받는, 보내는 둘다 관련이 있지만 보내는 객체가 밀접한 관련이 있다고 생각합니다.
+
+왜냐하면 결국 객체의 상태를 변화하는 것을 나타내기 때문입니다.
+
+### **[에러] Missing package product <package name>**
+
+[해결] File > Swift Packages > Reset Package Caches
+
+## 🤔결과
+
+![사진추가하기_결과](https://github.com/codesquad-members-2024/swift-drawing/assets/104732020/9de053bb-9cf3-40d7-8dcd-4d4088285ce0)
+
+## 📚추가학습
+
+### addTarget와 removeTarget 두 메서드의 공통 파라미터
+
+- target: 액션이 호출될 객체, nil일 경우 모든 이벤트도 받을 수 있다.
+- action: 실행할 메서드를 가리키는 selector, nil일 경우 target에 대해 모든 액션을 의미한다.
+- for: 이벤트 타입을 지정한다. 예시) .touchInside
+
+### addTarget  removeTarget
+
+특정 이벤트가 발생했을 때 실행하는 액션 메서드
+
+### removeTarget
+
+버튼에서 특정 액션을 제거하는데 사용하는 메서드
+
+- target = nil, action = nil 인 경우: 지정된 이벤트에 대해 모든 타겟과 액션을 제거한다
+- action = nil 인 경우: 지정된 타겟에 대해 모든 액션을 제거한다
+- 둘다 nil이 아닌 경우: 모든 타겟에서 지정된 액션을 제거 한다.
+
+</div>
+</details>
