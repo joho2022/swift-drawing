@@ -9,6 +9,12 @@ import Foundation
 import UIKit
 import os
 
+extension Notification.Name {
+    static let rectangleCreated = Notification.Name("rectangleCreated")
+    static let rectangleColorChanged = Notification.Name("rectangleColorChanged")
+    static let rectangleOpacityChanged = Notification.Name("rectangleOpacityChanged")
+}
+
 struct Plane {
     private let logger = os.Logger(subsystem: "pro.DrawingApp.model", category: "Plane")
     private(set) var rectangles = [RectangleModel]()
