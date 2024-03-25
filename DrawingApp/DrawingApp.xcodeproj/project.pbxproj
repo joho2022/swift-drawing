@@ -31,7 +31,10 @@
 		D61546812BAA7697003E375A /* CGRect+.swift in Sources */ = {isa = PBXBuildFile; fileRef = D61546802BAA7697003E375A /* CGRect+.swift */; };
 		D61546852BAA7D75003E375A /* BackgroundStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = D61546842BAA7D75003E375A /* BackgroundStack.swift */; };
 		D61546872BAA8880003E375A /* OpacityStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = D61546862BAA8880003E375A /* OpacityStack.swift */; };
-		D61546892BB1354A003E375A /* NotificaationName+.swift in Sources */ = {isa = PBXBuildFile; fileRef = D61546882BB1354A003E375A /* NotificaationName+.swift */; };
+		D633B9112BB14D2D000ED006 /* PhotoModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D633B9102BB14D2D000ED006 /* PhotoModel.swift */; };
+		D633B9132BB14FB4000ED006 /* VisualComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = D633B9122BB14FB4000ED006 /* VisualComponent.swift */; };
+		D633B9172BB1519A000ED006 /* PhotoManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D633B9162BB1519A000ED006 /* PhotoManager.swift */; };
+		D633B9192BB15694000ED006 /* PhotoModelFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = D633B9182BB15694000ED006 /* PhotoModelFactory.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -79,7 +82,10 @@
 		D61546802BAA7697003E375A /* CGRect+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGRect+.swift"; sourceTree = "<group>"; };
 		D61546842BAA7D75003E375A /* BackgroundStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundStack.swift; sourceTree = "<group>"; };
 		D61546862BAA8880003E375A /* OpacityStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpacityStack.swift; sourceTree = "<group>"; };
-		D61546882BB1354A003E375A /* NotificaationName+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NotificaationName+.swift"; sourceTree = "<group>"; };
+		D633B9102BB14D2D000ED006 /* PhotoModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoModel.swift; sourceTree = "<group>"; };
+		D633B9122BB14FB4000ED006 /* VisualComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualComponent.swift; sourceTree = "<group>"; };
+		D633B9162BB1519A000ED006 /* PhotoManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoManager.swift; sourceTree = "<group>"; };
+		D633B9182BB15694000ED006 /* PhotoModelFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoModelFactory.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -137,9 +143,11 @@
 				D61546752BA9F61A003E375A /* DrawableButton.swift */,
 				D61546772BAA0866003E375A /* DrawableButtonStack.swift */,
 				D61546832BAA7D5A003E375A /* Settings */,
+				D633B9152BB15067000ED006 /* PhotoModel */,
 				D61546682BA7DDE7003E375A /* Models */,
 				D61546672BA7DDDF003E375A /* ShapeProperties */,
 				D61546822BAA769F003E375A /* Extension */,
+				D633B9142BB14FBB000ED006 /* Protocol */,
 				D61546382BA7D07E003E375A /* Assets.xcassets */,
 				D615463A2BA7D07E003E375A /* LaunchScreen.storyboard */,
 				D615463D2BA7D07E003E375A /* Info.plist */,
@@ -191,7 +199,6 @@
 			isa = PBXGroup;
 			children = (
 				D61546802BAA7697003E375A /* CGRect+.swift */,
-				D61546882BB1354A003E375A /* NotificaationName+.swift */,
 			);
 			path = Extension;
 			sourceTree = "<group>";
@@ -204,6 +211,24 @@
 				D61546862BAA8880003E375A /* OpacityStack.swift */,
 			);
 			path = Settings;
+			sourceTree = "<group>";
+		};
+		D633B9142BB14FBB000ED006 /* Protocol */ = {
+			isa = PBXGroup;
+			children = (
+				D633B9122BB14FB4000ED006 /* VisualComponent.swift */,
+			);
+			path = Protocol;
+			sourceTree = "<group>";
+		};
+		D633B9152BB15067000ED006 /* PhotoModel */ = {
+			isa = PBXGroup;
+			children = (
+				D633B9102BB14D2D000ED006 /* PhotoModel.swift */,
+				D633B9182BB15694000ED006 /* PhotoModelFactory.swift */,
+				D633B9162BB1519A000ED006 /* PhotoManager.swift */,
+			);
+			path = PhotoModel;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -344,6 +369,7 @@
 			files = (
 				D61546872BAA8880003E375A /* OpacityStack.swift in Sources */,
 				D61546622BA7D90F003E375A /* Size.swift in Sources */,
+				D633B9172BB1519A000ED006 /* PhotoManager.swift in Sources */,
 				D615466E2BA92ECF003E375A /* IDGenerator.swift in Sources */,
 				D61546762BA9F61A003E375A /* DrawableButton.swift in Sources */,
 				D615467F2BAA734E003E375A /* SettingsPanelViewController.swift in Sources */,
@@ -358,9 +384,11 @@
 				D61546302BA7D07D003E375A /* AppDelegate.swift in Sources */,
 				D61546852BAA7D75003E375A /* BackgroundStack.swift in Sources */,
 				D61546742BA9C13A003E375A /* Plane.swift in Sources */,
+				D633B9192BB15694000ED006 /* PhotoModelFactory.swift in Sources */,
 				D61546782BAA0866003E375A /* DrawableButtonStack.swift in Sources */,
 				D61546322BA7D07D003E375A /* SceneDelegate.swift in Sources */,
-				D61546892BB1354A003E375A /* NotificaationName+.swift in Sources */,
+				D633B9132BB14FB4000ED006 /* VisualComponent.swift in Sources */,
+				D633B9112BB14D2D000ED006 /* PhotoModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

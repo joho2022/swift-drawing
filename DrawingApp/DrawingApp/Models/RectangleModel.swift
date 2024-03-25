@@ -7,7 +7,7 @@
 
 import Foundation
 
-class RectangleModel {
+class RectangleModel: VisualComponent {
     private(set) var uniqueID: UniqueID
     private(set) var size: Size
     private(set) var point: Point

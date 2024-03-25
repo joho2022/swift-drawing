@@ -12,10 +12,14 @@ import SnapKit
 class MainViewController: UIViewController {
     private let logger = os.Logger(subsystem: "pro.DrawingApp.model", category: "Main")
     private var selectedRectangleView: UIView?
+    private var selectedPhotoView: UIImageView?
     private var rectangleViews: [String: UIView] = [:]
-
+    private var photoViews: [Data: UIView] = [:]
+    
     private var plane = Plane()
     private var factory = RectangleFactory()
+    private var photoFactory = PhotoFactory()
+    private var photoManager = PhotoManager()
     
     private let drawableButtonStack = DrawableButtonStack()
     private let settingsPanelViewController = SettingsPanelViewController()
@@ -27,14 +31,16 @@ class MainViewController: UIViewController {
         
         let settingsFrame = view.bounds.with(width: 200)
         addChild(settingsPanelViewController, settingsFrame)
-
+        
         setupOpacityAction()
         setupBackgroundAction()
         setupView()
         
+        NotificationCenter.default.addObserver(self, selector: #selector(handlePhotoCreated(notification:)), name: .photoSelected, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(handleCreateRectangle(notification:)), name: .rectangleCreated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(handleColorChanged(notification:)), name: .rectangleColorChanged, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(handleOpacityChanged(notification:)), name: .rectangleOpacityChanged, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleRectOpacityChanged(notification:)), name: .rectangleOpacityChanged, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handlePhotoOpacityChanged(notification: )), name: .photoOpacityChanged, object: nil)
     }
     
     private func addChild(_ child: UIViewController, _ frame: CGRect) {
@@ -66,27 +72,33 @@ extension MainViewController {
         plane.createRectangleView(rectangleModel)
     }
     
-    @objc private func photoButtonTapped() {
-        logger.info("사진 버튼 Tapped!!")
-    }
-    
     @objc func viewTapped(_ sender: UITapGestureRecognizer) {
         let location = sender.location(in: view)
         let selectedPoint = Point(x: location.x, y: location.y)
         
-        if let rectangleModel = plane.rectangle(at: selectedPoint) {
-            guard let rectangleView = findRectangleView(for: rectangleModel) else { return }
-            selectedRectangleView?.layer.borderWidth = 0
-            
+        selectedRectangleView?.layer.borderWidth = 0
+        selectedPhotoView?.layer.borderWidth = 0
+        
+        if let rectangleModel = plane.rectangle(at: selectedPoint), let rectangleView = findView(for: rectangleModel) {
             selectedRectangleView = rectangleView
             selectedRectangleView?.layer.borderWidth = 4
             selectedRectangleView?.layer.borderColor = UIColor.blue.cgColor
             
-            logger.info("선택된 사각형의 ID는 \(rectangleModel.uniqueID.value)")
+            selectedPhotoView = nil
             
-        } else {
-            selectedRectangleView?.layer.borderWidth = 0
+            logger.info("선택된 사각형의 ID는 \(rectangleModel.uniqueID.value)")
+        }
+        else if let photoModel = photoManager.photo(at: selectedPoint), let photoView = findView(for: photoModel) {
+            selectedPhotoView = photoView
+            selectedPhotoView?.layer.borderWidth = 4
+            selectedPhotoView?.layer.borderColor = UIColor.blue.cgColor
+            
             selectedRectangleView = nil
+            
+            logger.info("선택된 이미지는 \(photoModel.imageData)")
+        } else {
+            selectedRectangleView = nil
+            selectedPhotoView = nil
         }
     }
     
@@ -112,20 +124,28 @@ extension MainViewController {
         
     }
     
-    @objc private func handleOpacityChanged(notification: Notification) {
+    @objc private func handleRectOpacityChanged(notification: Notification) {
         guard let userInfo = notification.userInfo,
               let uniqueID = userInfo["uniqueID"] as? String,
               let newOpacity = userInfo["opacity"] as? Opacity,
               let rectangleView = rectangleViews[uniqueID] else { return }
         
         updateViewOpacity(for: rectangleView, using: newOpacity)
-        logger.info("투명도 변경 수신완료! 투명도: \(Double(newOpacity.rawValue) / 10.0)")
+    }
+    
+    @objc private func handlePhotoOpacityChanged(notification: Notification) {
+        guard let userInfo = notification.userInfo,
+              let imageData = userInfo["imageData"] as? Data,
+              let newOpacity = userInfo["opacity"] as? Opacity,
+              let photoView = photoViews[imageData] else { return }
+        
+        updateViewOpacity(for: photoView, using: newOpacity)
     }
     
     private func setupBackgroundAction() {
         settingsPanelViewController.onColorChangeRequested = { [weak self] in
             guard let self = self,
-            let selectedRectangleView = self.selectedRectangleView else {
+                  let selectedRectangleView = self.selectedRectangleView else {
                 self?.logger.error("선택된 사각형이 없습니다.")
                 return
             }
@@ -136,13 +156,18 @@ extension MainViewController {
     
     private func setupOpacityAction() {
         settingsPanelViewController.onOpacityChangeRequested = { [weak self] newOpacity in
-            guard let self = self,
-                  let selectedRectangleView = self.selectedRectangleView else {
-                self?.logger.error("선택된 사각형이 없습니다.")
-                return
+            guard let self = self else { return }
+            if let selectedRectangleView = self.selectedRectangleView,
+               let uniqueID = self.findKey(for: selectedRectangleView) {
+                self.plane.updateRectangleOpacity(uniqueID: uniqueID, opacity: newOpacity)
+                self.logger.info("사각형 투명도가 업데이트되었습니다.")
+            } else if let selectedPhotoView = self.selectedPhotoView,
+                      let imageData = self.findKey(for: selectedPhotoView) {
+                photoManager.updatePhotoOpacity(imageData: imageData, opacity: newOpacity)
+                self.logger.info("이미지 투명도가 업데이트되었습니다.")
+            } else {
+                self.logger.error("선택된 사각형 또는 이미지가 없습니다.")
             }
-            let uniqueID = findKey(for: selectedRectangleView)!
-            plane.updateRectangleOpacity(uniqueID: uniqueID, opacity: newOpacity)
         }
     }
     
@@ -153,13 +178,23 @@ extension MainViewController {
         self.view.addSubview(view)
     }
     
-    private func findRectangleView(for model: RectangleModel) -> UIView? {
+    private func findView(for model: RectangleModel) -> UIView? {
         return rectangleViews[model.uniqueID.value]
+    }
+    
+    private func findView(for model: PhotoModel) -> UIImageView? {
+        return photoViews[model.imageData] as? UIImageView
     }
     
     private func findKey(for view: UIView) -> String? {
         return rectangleViews.first(where: { $0.value === view })?.key
     }
+    
+    private func findKey(for view: UIImageView) -> Data? {
+        return photoViews.first(where: { $0.value === view })?.key
+    }
+    
+    
     
     private func updateViewBackgroundColor(for view: UIView, using color: RGBColor) {
         let backgroundColor = UIColor(
@@ -173,6 +208,10 @@ extension MainViewController {
     }
     
     private func updateViewOpacity(for view: UIView, using opacity: Opacity) {
+        view.alpha = CGFloat(opacity.rawValue) / 10.0
+    }
+    
+    private func updateViewOpacity(for view: UIImageView, using opacity: Opacity) {
         view.alpha = CGFloat(opacity.rawValue) / 10.0
     }
     
@@ -195,3 +234,57 @@ extension MainViewController {
         return rect
     }
 }
+
+extension MainViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    @objc private func photoButtonTapped() {
+        logger.info("사진 버튼 Tapped!")
+        presentImagePicker()
+    }
+    
+    private func presentImagePicker() {
+        let imagePicker = UIImagePickerController()
+        imagePicker.delegate = self
+        imagePicker.sourceType = .photoLibrary
+        present(imagePicker, animated: true)
+    }
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        picker.dismiss(animated: true) {
+            guard let image = info[.originalImage] as? UIImage, let imageData = image.pngData() else {
+                self.logger.error("이미지가 존재하지 않습니다.")
+                return
+            }
+            let photoModel = self.createPhotoData(with: imageData)
+            self.photoManager.createImageView(photoModel)
+        }
+    }
+    
+    private func createPhotoData(with imageData: Data) -> PhotoModel {
+        let size = Size(width: 150.0, height: 120.0)
+        let subViewWidth = 200.0
+        let randomPoint = Point(x: Double.random(in: 0...(view.bounds.width - size.width - subViewWidth)), y: Double.random(in: 0...(view.bounds.height - size.height)))
+        let opacity = Opacity(value: 10)!
+        
+        let photo = photoFactory.createPhotoModel(imageData: imageData, size: size, point: randomPoint, opacity: opacity)
+        photoManager.addPhoto(photo)
+        
+        return photo
+    }
+    
+    @objc func handlePhotoCreated(notification: Notification) {
+        guard let userInfo = notification.userInfo,
+              let photoModel = userInfo["photoModel"] as? PhotoModel,
+              let photoView = userInfo["photoView"] as? UIImageView else { return }
+        
+        addPhotoViews(for: photoView, with: photoModel)
+    }
+    
+    func addPhotoViews(for view: UIImageView, with model: PhotoModel) {
+        photoViews[model.imageData] = view
+        
+        logger.info("생성된 이미지: \(self.photoViews.keys)")
+        self.view.addSubview(view)
+    }
+}
+
+
