@@ -35,14 +35,18 @@ class DrawableButtonStack: UIStackView {
     func setRectangleButtonAction(_ action: Selector?, target: Any?) {
         if let action = action {
             rectangleButton.addTarget(target, action: action, for: .touchUpInside)
+            rectangleButton.isEnabled = true
         } else {
-            rectangleButton.removeTarget(nil, action: nil, for: .touchUpInside)
+            rectangleButton.isEnabled = false
         }
     }
     
     func setPhotoButtonAction(_ action: Selector?, target: Any?) {
         if let action = action {
             photoButton.addTarget(target, action: action, for: .touchUpInside)
+            photoButton.isEnabled = true
+        } else {
+            photoButton.isEnabled = false
         }
     }
 }
