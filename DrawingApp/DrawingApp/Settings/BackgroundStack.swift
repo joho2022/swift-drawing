@@ -42,14 +42,16 @@ class BackgroundStack: UIStackView {
         setupStackView()
     }
     
-    func updateColorButtonTitle(_ title: String) {
-        changeColorButton.setTitle(title, for: .normal)
-        
-        if title == "None" {
+    func updateColorButtonTitle(with color: RGBColor?) {
+        guard let color = color else {
+            changeColorButton.setTitle("None", for: .normal)
             changeColorButton.setTitleColor(UIColor.systemGray, for: .normal)
-        } else {
-            changeColorButton.setTitleColor(UIColor.black, for: .normal)
+            return
         }
+
+        let hexString = convertToHexString(from: color)
+        changeColorButton.setTitle(hexString, for: .normal)
+        changeColorButton.setTitleColor(UIColor.black, for: .normal)
     }
     
     private func setupStackView() {
@@ -63,5 +65,9 @@ class BackgroundStack: UIStackView {
         if let action = changeAction {
             changeColorButton.addTarget(target, action: action, for: .touchUpInside)
         }
+    }
+    
+    private func convertToHexString(from color: RGBColor) -> String {
+        return String(format: "%02X%02X%02X", color.red, color.green, color.blue)
     }
 }

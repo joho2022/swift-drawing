@@ -11,7 +11,7 @@ class RectangleModel: VisualComponent {
     private(set) var uniqueID: UniqueID
     private(set) var size: Size
     private(set) var point: Point
-    private(set) var backgroundColor: RGBColor
+    private(set) var backgroundColor: RGBColor?
     private(set) var opacity: Opacity
     
     init(uniqueID: UniqueID, size: Size, point: Point, backgroundColor: RGBColor, opacity: Opacity) {
@@ -44,6 +44,6 @@ class RectangleModel: VisualComponent {
 
 extension RectangleModel: CustomStringConvertible {
     var description: String {
-        return "(\(uniqueID.value)), X:\(point.x),Y:\(point.y), W\(size.width), H:\(size.height), R:\(backgroundColor.red), G:\(backgroundColor.green), B:\(backgroundColor.blue), Alpha: \(opacity.rawValue)"
+        return "(\(uniqueID.value)), X:\(point.x),Y:\(point.y), W\(size.width), H:\(size.height), R:\(backgroundColor!.red), G:\(backgroundColor!.green), B:\(backgroundColor!.blue), Alpha: \(opacity.rawValue)"
     }
 }

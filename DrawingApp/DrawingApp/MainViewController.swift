@@ -99,7 +99,7 @@ extension MainViewController {
         
         self.logger.info("배경색 변경 수신완료!")
         updateViewBackgroundColor(for: rectangleView, using: randomColor)
-        changeColorButtonTitle(with: randomColor)
+        self.settingsPanelViewController.backgroundStack.updateColorButtonTitle(with: randomColor)
     }
     
     @objc private func handleOpacityChanged(notification: Notification) {
@@ -145,12 +145,8 @@ extension MainViewController {
         self.view.addSubview(view)
     }
     
-    private func findView(for model: RectangleModel) -> UIView? {
-        return viewRegistry[model.uniqueID]
-    }
-    
-    private func findView(for model: PhotoModel) -> UIImageView? {
-        return viewRegistry[model.uniqueID] as? UIImageView
+    private func findView(for component: VisualComponent) -> UIView? {
+        return viewRegistry[component.uniqueID]
     }
     
     private func findKey(for view: UIView) -> UniqueID? {
@@ -171,11 +167,6 @@ extension MainViewController {
     private func updateViewOpacity(for view: UIView, using opacity: Opacity) {
         view.alpha = CGFloat(opacity.rawValue) / 10.0
     }
-    
-    private func changeColorButtonTitle(with color: RGBColor) {
-            let hexString = String(format: "%02X%02X%02X", color.red, color.green, color.blue)
-            self.settingsPanelViewController.backgroundStack.updateColorButtonTitle(hexString)
-        }
     
     private func convertToHexString(from color: RGBColor) -> String {
         return String(format: "%02X%02X%02X", color.red, color.green, color.blue)
@@ -273,13 +264,9 @@ extension MainViewController: UIGestureRecognizerDelegate {
         
         switch sender.state {
         case .began:
-            if let rectangleModel = plane.hasRectangle(at: selectedPoint), let rectangleView = findView(for: rectangleModel), rectangleView == selectedView {
-                selectedView = rectangleView
-            } else if let photoModel = plane.hasPhoto(at: selectedPoint), let photoView = findView(for: photoModel), photoView == selectedView {
-                selectedView = photoView
+            if let component = plane.hasComponent(at: selectedPoint), findView(for: component) == selectedView {
+                    createTemporaryView(from: selectedView)
             }
-            
-            createTemporaryView(from: selectedView ?? nil)
         case .changed:
             if let tempView = temporaryView {
                 let newFrame = CGRect(x: newX - (tempView.frame.size.width / 2), y: newY - (tempView.frame.size.height / 2),width: tempView.frame.size.width, height: tempView.frame.size.height)
@@ -316,7 +303,6 @@ extension MainViewController: UIGestureRecognizerDelegate {
         }
     }
     
-        
     @objc func viewTapped(_ sender: UITapGestureRecognizer) {
         let newX = sender.location(in: view).x
         let newY = sender.location(in: view).y
@@ -324,35 +310,29 @@ extension MainViewController: UIGestureRecognizerDelegate {
         let selectedPoint = Point(x: newX, y: newY)
         viewRegistry.forEach { $0.value.layer.borderWidth = 0 }
         
-        if let rectangleModel = plane.hasRectangle(at: selectedPoint), let rectangleView = findView(for: rectangleModel) {
-            selectedView = rectangleView
-            logger.info("선택된 사각형의 ID는 \(rectangleModel.uniqueID.value)")
-        }
-        else if let photoModel = plane.hasPhoto(at: selectedPoint), let photoView = findView(for: photoModel) {
-            selectedView = photoView
-            logger.info("선택된 이미지는 \(photoModel.uniqueID.value)")
+        if let component = plane.hasComponent(at: selectedPoint), let view = findView(for: component) {
+            selectedView?.layer.borderWidth = 0
+            selectedView = view
+            selectedView?.layer.borderWidth = 4
+            selectedView?.layer.borderColor = UIColor.blue.cgColor
         } else {
             selectedView = nil
-        }
-        
-        if let selectedView = selectedView {
-            selectedView.layer.borderWidth = 4
-            selectedView.layer.borderColor = UIColor.blue.cgColor
         }
         
         updateColorButtonTitle()
     }
     
     private func updateColorButtonTitle() {
-        if let selectedView = selectedView, let uniqueID = findKey(for: selectedView) {
-            if let rectangleModel = plane.findRectangle(uniqueID: uniqueID.value) {
-                let hexString = convertToHexString(from: rectangleModel.backgroundColor)
-                self.settingsPanelViewController.backgroundStack.updateColorButtonTitle(hexString)
+        if let selectedView = selectedView,
+           let uniqueID = findKey(for: selectedView),
+           let component = plane.findComponent(uniqueID: uniqueID) {
+            if let color = component.backgroundColor {
+                self.settingsPanelViewController.backgroundStack.updateColorButtonTitle(with: color)
             } else {
-                self.settingsPanelViewController.backgroundStack.updateColorButtonTitle("None")
+                self.settingsPanelViewController.backgroundStack.updateColorButtonTitle(with: nil)
             }
         } else {
-            self.settingsPanelViewController.backgroundStack.updateColorButtonTitle("None")
+            self.settingsPanelViewController.backgroundStack.updateColorButtonTitle(with: nil)
         }
     }
 }
