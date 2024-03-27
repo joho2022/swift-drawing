@@ -539,3 +539,54 @@ Uniform Resource Locator 자원을 가리키는 주소
 
 </div>
 </details>
+
+<details>
+<summary>터치와 드래그</summary>
+
+## 🎯주요 작업
+
+- [x]  제스처인식기 동작 방식 학습하고, Delegate로 제스처 처리하기
+    - [x]  두 손가락을 터치를 기준으로 드래그 구현
+    - [x]  Pan 제스처 인식기 추가해서 구현
+    - [x]  사각형과 사진 모두 이동 가능하기
+    - [x]  드래그 하는 동안 선택한 것을 캡쳐하고 투명도를 0.5 정도 임시뷰를 표시하기
+    - [x]  손가락이 떨어지면 임시 뷰 사라짐, 선택한 뷰는 해당 위치 이동
+    - [x]  다른 뷰와 겹치더라도 생성한 순서에 따라서 위 또는 아래 위치
+    - [x]  화면에 보이는 뷰 좌표 뿐만 아니라 내부에서 처리하는 데이터 좌표도 변경
+
+## 📚학습 키워드
+
+### **UIGestureRecognizer - 세번째 미션 3일차**
+
+### **snapshotView(afterScreenUpdates:)**
+
+호출하는 당시의 뷰와 동일한 형태로 복사한다.
+
+- afterScreenUpdates가 true인 경우 - 애니메이션과 같은 뷰 커밋이 끝난 경우 캡쳐
+- afterScreenUpdates가 false인 경우 - 해당 시점에 바로 캡쳐
+
+### UIPanGestureRecognizer.state
+
+## 💻고민과 해결
+
+### [버그] imageData로 뷰를 찾는데 이미지의 고유성을 보장하지 않는다. (같은 사진이 2장인 경우)
+
+→ uniqueID으로 찾기
+
+→ 리팩토링하다보니 굳이 UIView 하위가 UIImageView인데 따로 데이터 관리하는 것이 비효율적으로 생각함.
+
+→ 하나의 딕셔너리에 모아서 관리하도록 하였음.
+
+### [버그] 탭 제스처와 펜 제스처가 충돌하는 느낌이 듦.
+
+→ 델리게이트 이용해서 탭 제스처가 되어서 테두리 선택이 되었을 때만 펜 제스처가 되도록 구현
+
+### CGPoint, CGRect,frame,bound가 헷갈려서 노가다로 원하는 결과를 구현하였다.
+
+→ 세번째 미션 2일차 좌표시스템 학습
+
+## 🤔결과
+![터치와드래그](https://github.com/codesquad-members-2024/swift-drawing/assets/104732020/298639e6-4cb8-4f68-94f6-d4b6c7463214)
+
+</div>
+</details>
