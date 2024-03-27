@@ -32,19 +32,10 @@ struct Plane: Updatable {
         return rectangles[index]
     }
     
-    func hasRectangle(at point: Point) -> RectangleModel? {
-        for rectangle in rectangles {
-            if rectangle.contains(point) {
-                return rectangle
-            }
-        }
-        return nil
-    }
-    
     func createRectangleView(_ data: RectangleModel) {
         let rectModel = data
         let rectView = UIView(frame: CGRect(x: rectModel.point.x, y: rectModel.point.y, width: rectModel.size.width, height: rectModel.size.height))
-        rectView.backgroundColor = UIColor(red: CGFloat(rectModel.backgroundColor.red) / 255.0, green: CGFloat(rectModel.backgroundColor.green) / 255.0, blue: CGFloat(rectModel.backgroundColor.blue) / 255.0, alpha: CGFloat(rectModel.opacity.rawValue) / 10.0)
+        rectView.backgroundColor = UIColor(red: CGFloat(rectModel.backgroundColor!.red) / 255.0, green: CGFloat(rectModel.backgroundColor!.green) / 255.0, blue: CGFloat(rectModel.backgroundColor!.blue) / 255.0, alpha: CGFloat(rectModel.opacity.rawValue) / 10.0)
         
         logger.info("사각형 생성 명령하달!!")
         NotificationCenter.default.post(name: .rectangleCreated, object: nil, userInfo: ["rectModel": rectModel, "rectView": rectView])
@@ -89,11 +80,13 @@ struct Plane: Updatable {
         }
     }
     
-    func findRectangle(uniqueID: String) -> RectangleModel? {
-        guard let index = rectangles.firstIndex(where: { $0.uniqueID.value == uniqueID }) else {
-            return nil
+    func findComponent(uniqueID: UniqueID) -> VisualComponent? {
+        if let rect = rectangles.first(where: { $0.uniqueID == uniqueID }) {
+            return rect
+        } else if let photo = photos.first(where: { $0.uniqueID == uniqueID }) {
+            return photo
         }
-        return rectangles[index]
+        return nil
     }
     
     private func getRandomColor() -> RGBColor {
@@ -103,11 +96,11 @@ struct Plane: Updatable {
 }
 
 extension Plane {
-    func hasPhoto(at point: Point) -> PhotoModel? {
-        for photo in photos {
-            if photo.contains(point) {
-                return photo
-            }
+    func hasComponent(at point: Point) -> VisualComponent? {
+        if let rect = rectangles.first(where: { $0.contains(point) }) {
+            return rect
+        } else if let photo = photos.first(where: { $0.contains(point) }) {
+            return photo
         }
         return nil
     }

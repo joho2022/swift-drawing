@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 struct RGBColor: Equatable {
     private(set) var red: Int

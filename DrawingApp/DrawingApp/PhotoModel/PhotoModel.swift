@@ -8,6 +8,7 @@
 import Foundation
 
 class PhotoModel: VisualComponent {
+    private(set) var backgroundColor: RGBColor? = nil
     private(set) var uniqueID: UniqueID
     private(set) var imageData: Data
     private(set) var size : Size
