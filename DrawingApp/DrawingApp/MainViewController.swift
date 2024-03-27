@@ -275,7 +275,7 @@ extension MainViewController: UIGestureRecognizerDelegate {
         case .began:
             if let rectangleModel = plane.hasRectangle(at: selectedPoint), let rectangleView = findView(for: rectangleModel), rectangleView == selectedView {
                 selectedView = rectangleView
-            } else if let photoModel = plane.photo(at: selectedPoint), let photoView = findView(for: photoModel), photoView == selectedView {
+            } else if let photoModel = plane.hasPhoto(at: selectedPoint), let photoView = findView(for: photoModel), photoView == selectedView {
                 selectedView = photoView
             }
             
@@ -311,7 +311,6 @@ extension MainViewController: UIGestureRecognizerDelegate {
     }
     
     private func updateModelPosition(for selectedView: UIView, to newPoint: Point) {
-        
         if let uniqueID = findKey(for: selectedView) {
             plane.updatePoint(uniqueID: uniqueID, point: newPoint)
         }
@@ -329,7 +328,7 @@ extension MainViewController: UIGestureRecognizerDelegate {
             selectedView = rectangleView
             logger.info("선택된 사각형의 ID는 \(rectangleModel.uniqueID.value)")
         }
-        else if let photoModel = plane.photo(at: selectedPoint), let photoView = findView(for: photoModel) {
+        else if let photoModel = plane.hasPhoto(at: selectedPoint), let photoView = findView(for: photoModel) {
             selectedView = photoView
             logger.info("선택된 이미지는 \(photoModel.uniqueID.value)")
         } else {
