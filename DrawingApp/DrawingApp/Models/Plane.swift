@@ -13,9 +13,10 @@ extension Notification.Name {
     static let rectangleCreated = Notification.Name("rectangleCreated")
     static let rectangleColorChanged = Notification.Name("rectangleColorChanged")
     static let rectangleOpacityChanged = Notification.Name("rectangleOpacityChanged")
+    static let pointUpdated = Notification.Name("pointUpdated")
 }
 
-struct Plane {
+struct Plane: Updatable {
     private let logger = os.Logger(subsystem: "pro.DrawingApp.model", category: "Plane")
     private(set) var rectangles = [RectangleModel]()
     
@@ -51,10 +52,10 @@ struct Plane {
         rectangles.append(rectangle)
     }
     
-    mutating func updateRectangleColor(uniqueID: String) {
+    mutating func updateRectangleColor(uniqueID: UniqueID) {
         let randomColor = getRandomColor()
         
-        if let index = rectangles.firstIndex(where: { $0.uniqueID.value == uniqueID }) {
+        if let index = rectangles.firstIndex(where: { $0.uniqueID == uniqueID }) {
             rectangles[index].setBackgroundColor(randomColor)
             
             self.logger.info("배경색 변경 명령하달!")
@@ -62,8 +63,16 @@ struct Plane {
         }
     }
     
-    mutating func updateRectangleOpacity(uniqueID: String, opacity: Opacity) {
-        if let index = rectangles.firstIndex(where: { $0.uniqueID.value == uniqueID }) {
+    mutating func updatePoint(uniqueID: UniqueID, point: Point) {
+        if let index = rectangles.firstIndex(where: { $0.uniqueID == uniqueID }) {
+            rectangles[index].setPoint(point)
+        }
+        
+        NotificationCenter.default.post(name: .pointUpdated, object: nil, userInfo: ["uniqueID": uniqueID, "point": point])
+    }
+    
+    mutating func updateOpacity(uniqueID: UniqueID, opacity: Opacity) {
+        if let index = rectangles.firstIndex(where: { $0.uniqueID == uniqueID }) {
             rectangles[index].setOpacity(opacity)
             self.logger.info("투명도 변경 명령하달!")
             NotificationCenter.default.post(name: .rectangleOpacityChanged, object: nil, userInfo: ["uniqueID": uniqueID, "opacity": opacity])

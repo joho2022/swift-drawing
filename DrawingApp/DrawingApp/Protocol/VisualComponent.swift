@@ -10,4 +10,5 @@ import Foundation
 protocol VisualComponent {
     func contains(_ point: Point) -> Bool
     func setOpacity(_ newOpacity: Opacity)
+    func setPoint(_ newPoint: Point)
 }

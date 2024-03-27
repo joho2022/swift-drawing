@@ -12,7 +12,10 @@ protocol PhotoModelFactoryProtocol {
 }
 
 class PhotoFactory: PhotoModelFactoryProtocol {
+    private let idGenerator = IDGenerator()
+    
     func createPhotoModel(imageData: Data, size: Size, point: Point, opacity: Opacity) -> PhotoModel {
-        return PhotoModel(imageData: imageData, size: size, point: point, opacity: opacity)
+        let uniqueID = idGenerator.generateUniqueRandomID()
+        return PhotoModel(uniqueID: uniqueID, imageData: imageData, size: size, point: point, opacity: opacity)
     }
 }

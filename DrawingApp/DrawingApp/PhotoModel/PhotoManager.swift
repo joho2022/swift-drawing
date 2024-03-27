@@ -13,7 +13,7 @@ extension Notification.Name {
     static let photoOpacityChanged = Notification.Name("photoOpacityChanged")
 }
 
-struct PhotoManager {
+struct PhotoManager: Updatable {
     private(set) var photos = [PhotoModel]()
     
     func photo(at point: Point) -> PhotoModel? {
@@ -40,12 +40,20 @@ struct PhotoManager {
         NotificationCenter.default.post(name: .photoSelected, object: nil, userInfo: ["photoModel": data, "photoView": imageView])
     }
     
-    mutating func updatePhotoOpacity(imageData: Data, opacity: Opacity) {
-        if let index = photos.firstIndex(where: { $0.imageData == imageData }) {
+    mutating func updateOpacity(uniqueID: UniqueID, opacity: Opacity) {
+        if let index = photos.firstIndex(where: { $0.uniqueID == uniqueID }) {
             photos[index].setOpacity(opacity)
             
-            NotificationCenter.default.post(name: .photoOpacityChanged, object: nil, userInfo: ["imageData": imageData, "opacity": opacity])
+            NotificationCenter.default.post(name: .photoOpacityChanged, object: nil, userInfo: ["uniqueID": uniqueID, "opacity": opacity])
         }
+    }
+    
+    mutating func updatePoint(uniqueID: UniqueID, point: Point) {
+        if let index = photos.firstIndex(where: { $0.uniqueID == uniqueID }) {
+            photos[index].setPoint(point) 
+        }
+        
+        NotificationCenter.default.post(name: .pointUpdated, object: nil, userInfo: ["uniqueID": uniqueID, "point": point])
     }
     
 }

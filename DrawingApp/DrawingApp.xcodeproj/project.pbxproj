@@ -35,6 +35,7 @@
 		D633B9132BB14FB4000ED006 /* VisualComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = D633B9122BB14FB4000ED006 /* VisualComponent.swift */; };
 		D633B9172BB1519A000ED006 /* PhotoManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D633B9162BB1519A000ED006 /* PhotoManager.swift */; };
 		D633B9192BB15694000ED006 /* PhotoModelFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = D633B9182BB15694000ED006 /* PhotoModelFactory.swift */; };
+		D633B91B2BB26E80000ED006 /* Updatable.swift in Sources */ = {isa = PBXBuildFile; fileRef = D633B91A2BB26E80000ED006 /* Updatable.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -86,6 +87,7 @@
 		D633B9122BB14FB4000ED006 /* VisualComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualComponent.swift; sourceTree = "<group>"; };
 		D633B9162BB1519A000ED006 /* PhotoManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoManager.swift; sourceTree = "<group>"; };
 		D633B9182BB15694000ED006 /* PhotoModelFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoModelFactory.swift; sourceTree = "<group>"; };
+		D633B91A2BB26E80000ED006 /* Updatable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Updatable.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -217,6 +219,7 @@
 			isa = PBXGroup;
 			children = (
 				D633B9122BB14FB4000ED006 /* VisualComponent.swift */,
+				D633B91A2BB26E80000ED006 /* Updatable.swift */,
 			);
 			path = Protocol;
 			sourceTree = "<group>";
@@ -369,6 +372,7 @@
 			files = (
 				D61546872BAA8880003E375A /* OpacityStack.swift in Sources */,
 				D61546622BA7D90F003E375A /* Size.swift in Sources */,
+				D633B91B2BB26E80000ED006 /* Updatable.swift in Sources */,
 				D633B9172BB1519A000ED006 /* PhotoManager.swift in Sources */,
 				D615466E2BA92ECF003E375A /* IDGenerator.swift in Sources */,
 				D61546762BA9F61A003E375A /* DrawableButton.swift in Sources */,
