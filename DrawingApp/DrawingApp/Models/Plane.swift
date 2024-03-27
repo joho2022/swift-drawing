@@ -10,15 +10,18 @@ import UIKit
 import os
 
 extension Notification.Name {
-    static let rectangleCreated = Notification.Name("rectangleCreated")
-    static let rectangleColorChanged = Notification.Name("rectangleColorChanged")
-    static let rectangleOpacityChanged = Notification.Name("rectangleOpacityChanged")
-    static let pointUpdated = Notification.Name("pointUpdated")
+    static let rectangleCreated = Notification.Name("Plane.rectangleCreated")
+    static let rectangleColorChanged = Notification.Name("Plane.rectangleColorChanged")
+    static let opacityChanged = Notification.Name("Plane.opacityChanged")
+    static let pointUpdated = Notification.Name("Plane.pointUpdated")
+    static let photoSelected = Notification.Name("Plane.photoSelected")
+    static let photoOpacityChanged = Notification.Name("Plane.photoOpacityChanged")
 }
 
 struct Plane: Updatable {
     private let logger = os.Logger(subsystem: "pro.DrawingApp.model", category: "Plane")
     private(set) var rectangles = [RectangleModel]()
+    private(set) var photos = [PhotoModel]()
     
     var totalRectangles: Int {
         return rectangles.count
@@ -29,7 +32,7 @@ struct Plane: Updatable {
         return rectangles[index]
     }
     
-    func rectangle(at point: Point) -> RectangleModel? {
+    func hasRectangle(at point: Point) -> RectangleModel? {
         for rectangle in rectangles {
             if rectangle.contains(point) {
                 return rectangle
@@ -66,16 +69,23 @@ struct Plane: Updatable {
     mutating func updatePoint(uniqueID: UniqueID, point: Point) {
         if let index = rectangles.firstIndex(where: { $0.uniqueID == uniqueID }) {
             rectangles[index].setPoint(point)
+            NotificationCenter.default.post(name: .pointUpdated, object: nil, userInfo: ["uniqueID": uniqueID, "point": point])
+        } else if let index = photos.firstIndex(where: { $0.uniqueID == uniqueID }) {
+            photos[index].setPoint(point)
+            NotificationCenter.default.post(name: .pointUpdated, object: nil, userInfo: ["uniqueID": uniqueID, "point": point])
         }
         
-        NotificationCenter.default.post(name: .pointUpdated, object: nil, userInfo: ["uniqueID": uniqueID, "point": point])
     }
     
     mutating func updateOpacity(uniqueID: UniqueID, opacity: Opacity) {
         if let index = rectangles.firstIndex(where: { $0.uniqueID == uniqueID }) {
             rectangles[index].setOpacity(opacity)
-            self.logger.info("투명도 변경 명령하달!")
-            NotificationCenter.default.post(name: .rectangleOpacityChanged, object: nil, userInfo: ["uniqueID": uniqueID, "opacity": opacity])
+            self.logger.info("사각형의 투명도 변경 명령하달!")
+            NotificationCenter.default.post(name: .opacityChanged, object: nil, userInfo: ["uniqueID": uniqueID, "opacity": opacity])
+        } else if let index = photos.firstIndex(where: { $0.uniqueID == uniqueID }) {
+            photos[index].setOpacity(opacity)
+            self.logger.info("사진의 투명도 변경 명령하달!")
+            NotificationCenter.default.post(name: .opacityChanged, object: nil, userInfo: ["uniqueID": uniqueID, "opacity": opacity])
         }
     }
     
@@ -89,5 +99,31 @@ struct Plane: Updatable {
     private func getRandomColor() -> RGBColor {
         let randomColor = RGBColor(red: Int.random(in: 0...255), green: Int.random(in: 0...255), blue: Int.random(in: 0...255))!
         return randomColor
+    }
+}
+
+extension Plane {
+    func photo(at point: Point) -> PhotoModel? {
+        for photo in photos {
+            if photo.contains(point) {
+                return photo
+            }
+        }
+        return nil
+    }
+    
+    mutating func addPhoto(_ photo: PhotoModel) {
+        return photos.append(photo)
+    }
+    
+    func createImageView(_ data: PhotoModel) {
+        let imageView = UIImageView(frame: CGRect(x: data.point.x, y: data.point.y, width: data.size.width, height: data.size.height))
+        
+        if let image = UIImage(data: data.imageData) {
+            imageView.image = image
+        }
+        imageView.alpha = CGFloat(data.opacity.rawValue) / 10.0
+        
+        NotificationCenter.default.post(name: .photoSelected, object: nil, userInfo: ["photoModel": data, "photoView": imageView])
     }
 }
