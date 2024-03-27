@@ -36,6 +36,10 @@ class RectangleModel: VisualComponent {
     func setOpacity(_ newOpacity: Opacity) {
         return self.opacity = newOpacity
     }
+    
+    func setPoint(_ newPoint: Point) {
+        return self.point = newPoint
+    }
 }
 
 extension RectangleModel: CustomStringConvertible {

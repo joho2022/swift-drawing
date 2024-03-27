@@ -8,30 +8,29 @@
 import UIKit
 import os
 import SnapKit
+import Foundation
 
 class MainViewController: UIViewController {
     private let logger = os.Logger(subsystem: "pro.DrawingApp.model", category: "Main")
-    private var selectedRectangleView: UIView?
-    private var selectedPhotoView: UIImageView?
-    private var rectangleViews: [String: UIView] = [:]
-    private var photoViews: [Data: UIView] = [:]
+    private var selectedView: UIView?
+    private var temporaryView: UIView?
+    
+    private var viewRegistry: [UniqueID: UIView] = [:]
     
     private var plane = Plane()
+    private var photoManager = PhotoManager()
     private var factory = RectangleFactory()
     private var photoFactory = PhotoFactory()
-    private var photoManager = PhotoManager()
     
     private let drawableButtonStack = DrawableButtonStack()
     private let settingsPanelViewController = SettingsPanelViewController()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(viewTapped(_:)))
-        view.addGestureRecognizer(tapGestureRecognizer)
-        
         let settingsFrame = view.bounds.with(width: 200)
         addChild(settingsPanelViewController, settingsFrame)
         
+        setupGesture()
         setupOpacityAction()
         setupBackgroundAction()
         setupView()
@@ -41,6 +40,7 @@ class MainViewController: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(handleColorChanged(notification:)), name: .rectangleColorChanged, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(handleRectOpacityChanged(notification:)), name: .rectangleOpacityChanged, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(handlePhotoOpacityChanged(notification: )), name: .photoOpacityChanged, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handlePointUpdate(notification:)), name: .pointUpdated, object: nil)
     }
     
     private func addChild(_ child: UIViewController, _ frame: CGRect) {
@@ -72,34 +72,15 @@ extension MainViewController {
         plane.createRectangleView(rectangleModel)
     }
     
-    @objc func viewTapped(_ sender: UITapGestureRecognizer) {
-        let location = sender.location(in: view)
-        let selectedPoint = Point(x: location.x, y: location.y)
+    @objc private func handlePointUpdate(notification: Notification) {
+        guard let userInfo = notification.userInfo,
+              let uniqueID = userInfo["uniqueID"] as? UniqueID,
+              let newPoint = userInfo["point"] as? Point,
+              let selectedView = viewRegistry[uniqueID] else { return }
+        let newX = CGFloat(newPoint.x)
+        let newY = CGFloat(newPoint.y)
         
-        selectedRectangleView?.layer.borderWidth = 0
-        selectedPhotoView?.layer.borderWidth = 0
-        
-        if let rectangleModel = plane.rectangle(at: selectedPoint), let rectangleView = findView(for: rectangleModel) {
-            selectedRectangleView = rectangleView
-            selectedRectangleView?.layer.borderWidth = 4
-            selectedRectangleView?.layer.borderColor = UIColor.blue.cgColor
-            
-            selectedPhotoView = nil
-            
-            logger.info("선택된 사각형의 ID는 \(rectangleModel.uniqueID.value)")
-        }
-        else if let photoModel = photoManager.photo(at: selectedPoint), let photoView = findView(for: photoModel) {
-            selectedPhotoView = photoView
-            selectedPhotoView?.layer.borderWidth = 4
-            selectedPhotoView?.layer.borderColor = UIColor.blue.cgColor
-            
-            selectedRectangleView = nil
-            
-            logger.info("선택된 이미지는 \(photoModel.imageData)")
-        } else {
-            selectedRectangleView = nil
-            selectedPhotoView = nil
-        }
+        selectedView.frame = CGRect(x: newX, y: newY, width: selectedView.frame.size.width, height: selectedView.frame.size.height)
     }
     
     @objc private func handleCreateRectangle(notification: Notification) {
@@ -114,9 +95,9 @@ extension MainViewController {
     
     @objc private func handleColorChanged(notification: Notification) {
         guard let userInfo = notification.userInfo,
-              let uniqueID = userInfo["uniqueID"] as? String,
+              let uniqueID = userInfo["uniqueID"] as? UniqueID,
               let randomColor = userInfo["randomColor"] as? RGBColor,
-              let rectangleView = rectangleViews[uniqueID] else { return }
+              let rectangleView = viewRegistry[uniqueID] else { return }
         
         self.logger.info("배경색 변경 수신완료!")
         updateViewBackgroundColor(for: rectangleView, using: randomColor)
@@ -126,18 +107,18 @@ extension MainViewController {
     
     @objc private func handleRectOpacityChanged(notification: Notification) {
         guard let userInfo = notification.userInfo,
-              let uniqueID = userInfo["uniqueID"] as? String,
+              let uniqueID = userInfo["uniqueID"] as? UniqueID,
               let newOpacity = userInfo["opacity"] as? Opacity,
-              let rectangleView = rectangleViews[uniqueID] else { return }
+              let rectangleView = viewRegistry[uniqueID] else { return }
         
         updateViewOpacity(for: rectangleView, using: newOpacity)
     }
     
     @objc private func handlePhotoOpacityChanged(notification: Notification) {
         guard let userInfo = notification.userInfo,
-              let imageData = userInfo["imageData"] as? Data,
+              let uniqueID = userInfo["uniqueID"] as? UniqueID,
               let newOpacity = userInfo["opacity"] as? Opacity,
-              let photoView = photoViews[imageData] else { return }
+              let photoView = viewRegistry[uniqueID] else { return }
         
         updateViewOpacity(for: photoView, using: newOpacity)
     }
@@ -145,7 +126,7 @@ extension MainViewController {
     private func setupBackgroundAction() {
         settingsPanelViewController.onColorChangeRequested = { [weak self] in
             guard let self = self,
-                  let selectedRectangleView = self.selectedRectangleView else {
+                  let selectedRectangleView = self.selectedView else {
                 self?.logger.error("선택된 사각형이 없습니다.")
                 return
             }
@@ -156,45 +137,49 @@ extension MainViewController {
     
     private func setupOpacityAction() {
         settingsPanelViewController.onOpacityChangeRequested = { [weak self] newOpacity in
-            guard let self = self else { return }
-            if let selectedRectangleView = self.selectedRectangleView,
-               let uniqueID = self.findKey(for: selectedRectangleView) {
-                self.plane.updateRectangleOpacity(uniqueID: uniqueID, opacity: newOpacity)
-                self.logger.info("사각형 투명도가 업데이트되었습니다.")
-            } else if let selectedPhotoView = self.selectedPhotoView,
-                      let imageData = self.findKey(for: selectedPhotoView) {
-                photoManager.updatePhotoOpacity(imageData: imageData, opacity: newOpacity)
-                self.logger.info("이미지 투명도가 업데이트되었습니다.")
-            } else {
-                self.logger.error("선택된 사각형 또는 이미지가 없습니다.")
+            guard let self = self,
+                  let selectedView = self.selectedView else {
+                self?.logger.error("선택된 사각형 또는 이미지가 없습니다.")
+                return
+            }
+            
+            if let uniqueID = self.findKey(for: selectedView) {
+                var manager: Updatable? = self.findManager(for: uniqueID)
+                
+                manager?.updateOpacity(uniqueID: uniqueID, opacity: newOpacity)
+                self.logger.info("투명도 업데이트!")
             }
         }
     }
     
-    private func addRectangleViews(for view: UIView, with model: RectangleModel) {
-        rectangleViews[model.uniqueID.value] = view
+    private func findManager(for uniqueID: UniqueID) -> Updatable? {
+        if plane.rectangles.contains(where: { $0.uniqueID == uniqueID }) {
+            return plane
+        } else if photoManager.photos.contains(where: { $0.uniqueID == uniqueID }) {
+            return photoManager
+        }
         
-        logger.info("생성된 키는\(self.rectangleViews.keys)")
+        return nil
+    }
+    
+    private func addRectangleViews(for view: UIView, with model: RectangleModel) {
+        viewRegistry[model.uniqueID] = view
+        
+        logger.info("생성된 키는\(self.viewRegistry.keys)")
         self.view.addSubview(view)
     }
     
     private func findView(for model: RectangleModel) -> UIView? {
-        return rectangleViews[model.uniqueID.value]
+        return viewRegistry[model.uniqueID]
     }
     
     private func findView(for model: PhotoModel) -> UIImageView? {
-        return photoViews[model.imageData] as? UIImageView
+        return viewRegistry[model.uniqueID] as? UIImageView
     }
     
-    private func findKey(for view: UIView) -> String? {
-        return rectangleViews.first(where: { $0.value === view })?.key
+    private func findKey(for view: UIView) -> UniqueID? {
+        return viewRegistry.first(where: { $0.value === view })?.key
     }
-    
-    private func findKey(for view: UIImageView) -> Data? {
-        return photoViews.first(where: { $0.value === view })?.key
-    }
-    
-    
     
     private func updateViewBackgroundColor(for view: UIView, using color: RGBColor) {
         let backgroundColor = UIColor(
@@ -280,10 +265,106 @@ extension MainViewController: UIImagePickerControllerDelegate, UINavigationContr
     }
     
     func addPhotoViews(for view: UIImageView, with model: PhotoModel) {
-        photoViews[model.imageData] = view
+        viewRegistry[model.uniqueID] = view
         
-        logger.info("생성된 이미지: \(self.photoViews.keys)")
+        logger.info("생성된 이미지: \(self.viewRegistry.keys)")
         self.view.addSubview(view)
+    }
+}
+
+extension MainViewController: UIGestureRecognizerDelegate {
+    private func setupGesture() {
+        let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(viewTapped(_:)))
+        view.addGestureRecognizer(tapGestureRecognizer)
+        
+        let panGesture = UIPanGestureRecognizer.init(target: self, action: #selector(handlePanGesture(_:)))
+        panGesture.delegate = self
+        view.addGestureRecognizer(panGesture)
+        
+        func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+            if gestureRecognizer == panGesture {
+                return selectedView != nil
+            }
+            return true
+        }
+    }
+    
+    @objc func handlePanGesture(_ sender: UIPanGestureRecognizer) {
+        let newX = sender.location(in: view).x
+        let newY = sender.location(in: view).y
+        
+        let selectedPoint = Point(x: newX, y: newY)
+        
+        switch sender.state {
+        case .began:
+            if let rectangleModel = plane.rectangle(at: selectedPoint), let rectangleView = findView(for: rectangleModel), rectangleView == selectedView {
+                selectedView = rectangleView
+            } else if let photoModel = photoManager.photo(at: selectedPoint), let photoView = findView(for: photoModel), photoView == selectedView {
+                selectedView = photoView
+            }
+            
+            createTemporaryView(from: selectedView ?? nil)
+        case .changed:
+            if let tempView = temporaryView {
+                let newFrame = CGRect(x: newX - (tempView.frame.size.width / 2), y: newY - (tempView.frame.size.height / 2),width: tempView.frame.size.width, height: tempView.frame.size.height)
+                temporaryView?.frame = newFrame
+            }
+        case .ended, .cancelled:
+            guard let selectedView = selectedView else { return }
+            
+            updateModelPosition(for: selectedView, to: Point(x: newX - (selectedView.frame.size.width / 2), y: newY - (selectedView.frame.size.height / 2)))
+            
+            temporaryView?.removeFromSuperview()
+            temporaryView = nil
+        default:
+            break
+        }
+    }
+      
+    private func createTemporaryView(from selectedView: UIView?) {
+        guard let selectedView = selectedView else { return }
+        let snapshot = selectedView.snapshotView(afterScreenUpdates: true)
+        
+        if let snapshot = snapshot {
+            snapshot.frame = selectedView.frame
+            snapshot.alpha = 0.5
+            self.view.addSubview(snapshot)
+            
+            temporaryView = snapshot
+        }
+    }
+    
+    private func updateModelPosition(for selectedView: UIView, to newPoint: Point) {
+        
+        if let uniqueID = findKey(for: selectedView) {
+            var manager: Updatable? = self.findManager(for: uniqueID)
+            manager?.updatePoint(uniqueID: uniqueID, point: newPoint)
+        }
+    }
+    
+        
+    @objc func viewTapped(_ sender: UITapGestureRecognizer) {
+        let newX = sender.location(in: view).x
+        let newY = sender.location(in: view).y
+        
+        let selectedPoint = Point(x: newX, y: newY)
+        viewRegistry.forEach { $0.value.layer.borderWidth = 0 }
+        
+        if let rectangleModel = plane.rectangle(at: selectedPoint), let rectangleView = findView(for: rectangleModel) {
+            selectedView = rectangleView
+            logger.info("선택된 사각형의 ID는 \(rectangleModel.uniqueID.value)")
+        }
+        else if let photoModel = photoManager.photo(at: selectedPoint), let photoView = findView(for: photoModel) {
+            selectedView = photoView
+            logger.info("선택된 이미지는 \(photoModel.uniqueID.value)")
+        } else {
+            selectedView = nil
+        }
+        
+        if let selectedView = selectedView {
+            selectedView.layer.borderWidth = 4
+            selectedView.layer.borderColor = UIColor.blue.cgColor
+        }
     }
 }
 
