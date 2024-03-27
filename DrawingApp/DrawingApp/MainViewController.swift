@@ -18,7 +18,6 @@ class MainViewController: UIViewController {
     private var viewRegistry: [UniqueID: UIView] = [:]
     
     private var plane = Plane()
-    private var photoManager = PhotoManager()
     private var factory = RectangleFactory()
     private var photoFactory = PhotoFactory()
     
@@ -38,8 +37,7 @@ class MainViewController: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(handlePhotoCreated(notification:)), name: .photoSelected, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(handleCreateRectangle(notification:)), name: .rectangleCreated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(handleColorChanged(notification:)), name: .rectangleColorChanged, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(handleRectOpacityChanged(notification:)), name: .rectangleOpacityChanged, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(handlePhotoOpacityChanged(notification: )), name: .photoOpacityChanged, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleOpacityChanged(notification:)), name: .opacityChanged, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(handlePointUpdate(notification:)), name: .pointUpdated, object: nil)
     }
     
@@ -104,22 +102,13 @@ extension MainViewController {
         changeColorButtonTitle(with: randomColor)
     }
     
-    @objc private func handleRectOpacityChanged(notification: Notification) {
+    @objc private func handleOpacityChanged(notification: Notification) {
         guard let userInfo = notification.userInfo,
               let uniqueID = userInfo["uniqueID"] as? UniqueID,
               let newOpacity = userInfo["opacity"] as? Opacity,
-              let rectangleView = viewRegistry[uniqueID] else { return }
+              let selectedView = viewRegistry[uniqueID] else { return }
         
-        updateViewOpacity(for: rectangleView, using: newOpacity)
-    }
-    
-    @objc private func handlePhotoOpacityChanged(notification: Notification) {
-        guard let userInfo = notification.userInfo,
-              let uniqueID = userInfo["uniqueID"] as? UniqueID,
-              let newOpacity = userInfo["opacity"] as? Opacity,
-              let photoView = viewRegistry[uniqueID] else { return }
-        
-        updateViewOpacity(for: photoView, using: newOpacity)
+        updateViewOpacity(for: selectedView, using: newOpacity)
     }
     
     private func setupBackgroundAction() {
@@ -143,22 +132,10 @@ extension MainViewController {
             }
             
             if let uniqueID = self.findKey(for: selectedView) {
-                var manager: Updatable? = self.findManager(for: uniqueID)
-                
-                manager?.updateOpacity(uniqueID: uniqueID, opacity: newOpacity)
+                plane.updateOpacity(uniqueID: uniqueID, opacity: newOpacity)
                 self.logger.info("투명도 업데이트!")
             }
         }
-    }
-    
-    private func findManager(for uniqueID: UniqueID) -> Updatable? {
-        if plane.rectangles.contains(where: { $0.uniqueID == uniqueID }) {
-            return plane
-        } else if photoManager.photos.contains(where: { $0.uniqueID == uniqueID }) {
-            return photoManager
-        }
-        
-        return nil
     }
     
     private func addRectangleViews(for view: UIView, with model: RectangleModel) {
@@ -192,10 +169,6 @@ extension MainViewController {
     }
     
     private func updateViewOpacity(for view: UIView, using opacity: Opacity) {
-        view.alpha = CGFloat(opacity.rawValue) / 10.0
-    }
-    
-    private func updateViewOpacity(for view: UIImageView, using opacity: Opacity) {
         view.alpha = CGFloat(opacity.rawValue) / 10.0
     }
     
@@ -243,7 +216,7 @@ extension MainViewController: UIImagePickerControllerDelegate, UINavigationContr
                 return
             }
             let photoModel = self.createPhotoData(with: imageData)
-            self.photoManager.createImageView(photoModel)
+            self.plane.createImageView(photoModel)
         }
     }
     
@@ -254,7 +227,7 @@ extension MainViewController: UIImagePickerControllerDelegate, UINavigationContr
         let opacity = Opacity(value: 10)!
         
         let photo = photoFactory.createPhotoModel(imageData: imageData, size: size, point: randomPoint, opacity: opacity)
-        photoManager.addPhoto(photo)
+        plane.addPhoto(photo)
         
         return photo
     }
@@ -300,9 +273,9 @@ extension MainViewController: UIGestureRecognizerDelegate {
         
         switch sender.state {
         case .began:
-            if let rectangleModel = plane.rectangle(at: selectedPoint), let rectangleView = findView(for: rectangleModel), rectangleView == selectedView {
+            if let rectangleModel = plane.hasRectangle(at: selectedPoint), let rectangleView = findView(for: rectangleModel), rectangleView == selectedView {
                 selectedView = rectangleView
-            } else if let photoModel = photoManager.photo(at: selectedPoint), let photoView = findView(for: photoModel), photoView == selectedView {
+            } else if let photoModel = plane.photo(at: selectedPoint), let photoView = findView(for: photoModel), photoView == selectedView {
                 selectedView = photoView
             }
             
@@ -340,8 +313,7 @@ extension MainViewController: UIGestureRecognizerDelegate {
     private func updateModelPosition(for selectedView: UIView, to newPoint: Point) {
         
         if let uniqueID = findKey(for: selectedView) {
-            var manager: Updatable? = self.findManager(for: uniqueID)
-            manager?.updatePoint(uniqueID: uniqueID, point: newPoint)
+            plane.updatePoint(uniqueID: uniqueID, point: newPoint)
         }
     }
     
@@ -353,11 +325,11 @@ extension MainViewController: UIGestureRecognizerDelegate {
         let selectedPoint = Point(x: newX, y: newY)
         viewRegistry.forEach { $0.value.layer.borderWidth = 0 }
         
-        if let rectangleModel = plane.rectangle(at: selectedPoint), let rectangleView = findView(for: rectangleModel) {
+        if let rectangleModel = plane.hasRectangle(at: selectedPoint), let rectangleView = findView(for: rectangleModel) {
             selectedView = rectangleView
             logger.info("선택된 사각형의 ID는 \(rectangleModel.uniqueID.value)")
         }
-        else if let photoModel = photoManager.photo(at: selectedPoint), let photoView = findView(for: photoModel) {
+        else if let photoModel = plane.photo(at: selectedPoint), let photoView = findView(for: photoModel) {
             selectedView = photoView
             logger.info("선택된 이미지는 \(photoModel.uniqueID.value)")
         } else {
