@@ -103,7 +103,7 @@ struct Plane: Updatable {
 }
 
 extension Plane {
-    func photo(at point: Point) -> PhotoModel? {
+    func hasPhoto(at point: Point) -> PhotoModel? {
         for photo in photos {
             if photo.contains(point) {
                 return photo
