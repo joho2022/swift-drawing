@@ -101,8 +101,7 @@ extension MainViewController {
         
         self.logger.info("배경색 변경 수신완료!")
         updateViewBackgroundColor(for: rectangleView, using: randomColor)
-        updateColorButtonTitle(with: randomColor)
-        
+        changeColorButtonTitle(with: randomColor)
     }
     
     @objc private func handleRectOpacityChanged(notification: Notification) {
@@ -200,9 +199,13 @@ extension MainViewController {
         view.alpha = CGFloat(opacity.rawValue) / 10.0
     }
     
-    private func updateColorButtonTitle(with color: RGBColor) {
-        let hexString = String(format: "%02X%02X%02X", color.red, color.green, color.blue)
-        self.settingsPanelViewController.backgroundStack.updateColorButtonTitle(hexString)
+    private func changeColorButtonTitle(with color: RGBColor) {
+            let hexString = String(format: "%02X%02X%02X", color.red, color.green, color.blue)
+            self.settingsPanelViewController.backgroundStack.updateColorButtonTitle(hexString)
+        }
+    
+    private func convertToHexString(from color: RGBColor) -> String {
+        return String(format: "%02X%02X%02X", color.red, color.green, color.blue)
     }
     
     private func createRectangleData() -> RectangleModel {
@@ -364,6 +367,21 @@ extension MainViewController: UIGestureRecognizerDelegate {
         if let selectedView = selectedView {
             selectedView.layer.borderWidth = 4
             selectedView.layer.borderColor = UIColor.blue.cgColor
+        }
+        
+        updateColorButtonTitle()
+    }
+    
+    private func updateColorButtonTitle() {
+        if let selectedView = selectedView, let uniqueID = findKey(for: selectedView) {
+            if let rectangleModel = plane.findRectangle(uniqueID: uniqueID.value) {
+                let hexString = convertToHexString(from: rectangleModel.backgroundColor)
+                self.settingsPanelViewController.backgroundStack.updateColorButtonTitle(hexString)
+            } else {
+                self.settingsPanelViewController.backgroundStack.updateColorButtonTitle("None")
+            }
+        } else {
+            self.settingsPanelViewController.backgroundStack.updateColorButtonTitle("None")
         }
     }
 }

@@ -21,7 +21,7 @@ class BackgroundStack: UIStackView {
         var config = UIButton.Configuration.plain()
         config.cornerStyle = .medium
         config.title = "None"
-        config.baseForegroundColor = UIColor.black
+        config.baseForegroundColor = UIColor.systemGray
         
         let button = UIButton(configuration: config, primaryAction: nil)
         
@@ -44,6 +44,12 @@ class BackgroundStack: UIStackView {
     
     func updateColorButtonTitle(_ title: String) {
         changeColorButton.setTitle(title, for: .normal)
+        
+        if title == "None" {
+            changeColorButton.setTitleColor(UIColor.systemGray, for: .normal)
+        } else {
+            changeColorButton.setTitleColor(UIColor.black, for: .normal)
+        }
     }
     
     private func setupStackView() {
