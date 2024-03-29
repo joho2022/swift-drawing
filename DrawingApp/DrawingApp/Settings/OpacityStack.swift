@@ -21,6 +21,7 @@ class OpacityStack: UIStackView {
         let slider = UISlider()
         slider.minimumValue = 1
         slider.maximumValue = 10
+        slider.tintColor = UIColor.black
         slider.value = 10
         
         return slider

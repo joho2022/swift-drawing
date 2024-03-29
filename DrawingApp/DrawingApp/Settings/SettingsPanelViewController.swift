@@ -14,6 +14,9 @@ class SettingsPanelViewController: UIViewController {
     
     private(set) var backgroundStack = BackgroundStack()
     private(set) var opacityStack = OpacityStack()
+    private(set) var pointStack = StepperStack(frame: .zero, title: "위치", firstLabelText: "X", secondLabelText: "Y", firstStepperType: .positionX, secondStepperType: .positionY)
+    private(set) var sizeStack = StepperStack(frame: .zero, title: "크기", firstLabelText: "W", secondLabelText: "H", firstStepperType: .width, secondStepperType: .height)
+
     
     var onColorChangeRequested: (() -> Void)?
     var onOpacityChangeRequested: ((Opacity) -> Void)?
@@ -29,7 +32,9 @@ extension SettingsPanelViewController {
     func setupView() {
         [
             backgroundStack,
-            opacityStack
+            opacityStack,
+            pointStack,
+            sizeStack
         ].forEach { view.addSubview($0) }
         
         backgroundStack.snp.makeConstraints {
@@ -54,6 +59,18 @@ extension SettingsPanelViewController {
             sliderChanged: #selector(sliderChanged),
             target: self
         )
+        
+        pointStack.snp.makeConstraints {
+            $0.top.equalTo(opacityStack.snp.bottom).offset(20)
+            $0.leading.equalTo(opacityStack.snp.leading)
+            $0.trailing.equalTo(opacityStack.snp.trailing)
+        }
+        
+        sizeStack.snp.makeConstraints {
+            $0.top.equalTo(pointStack.snp.bottom).offset(20)
+            $0.leading.equalTo(pointStack.snp.leading)
+            $0.trailing.equalTo(pointStack.snp.trailing)
+        }
     }
     
     @objc func changeColorTapped() {

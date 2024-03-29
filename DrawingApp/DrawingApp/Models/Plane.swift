@@ -14,6 +14,7 @@ extension Notification.Name {
     static let rectangleColorChanged = Notification.Name("Plane.rectangleColorChanged")
     static let opacityChanged = Notification.Name("Plane.opacityChanged")
     static let pointUpdated = Notification.Name("Plane.pointUpdated")
+    static let sizeUpdated = Notification.Name("Plane.sizeUpdate")
     static let photoSelected = Notification.Name("Plane.photoSelected")
     static let photoOpacityChanged = Notification.Name("Plane.photoOpacityChanged")
 }
@@ -65,7 +66,16 @@ struct Plane: Updatable {
             photos[index].setPoint(point)
             NotificationCenter.default.post(name: .pointUpdated, object: nil, userInfo: ["uniqueID": uniqueID, "point": point])
         }
-        
+    }
+    
+    mutating func updateSize(uniqueID: UniqueID, size: Size) {
+        if let index = rectangles.firstIndex(where: { $0.uniqueID == uniqueID }) {
+            rectangles[index].setSize(size)
+            NotificationCenter.default.post(name: .sizeUpdated, object: nil, userInfo: ["uniqueID": uniqueID, "size": size])
+        } else if let index = photos.firstIndex(where: { $0.uniqueID == uniqueID }) {
+            photos[index].setSize(size)
+            NotificationCenter.default.post(name: .sizeUpdated, object: nil, userInfo: ["uniqueID": uniqueID, "size": size])
+        }
     }
     
     mutating func updateOpacity(uniqueID: UniqueID, opacity: Opacity) {

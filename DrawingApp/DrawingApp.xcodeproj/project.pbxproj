@@ -36,6 +36,7 @@
 		D633B9192BB15694000ED006 /* PhotoModelFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = D633B9182BB15694000ED006 /* PhotoModelFactory.swift */; };
 		D633B91B2BB26E80000ED006 /* Updatable.swift in Sources */ = {isa = PBXBuildFile; fileRef = D633B91A2BB26E80000ED006 /* Updatable.swift */; };
 		D633B91D2BB3FB04000ED006 /* StepperControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = D633B91C2BB3FB04000ED006 /* StepperControl.swift */; };
+		D633B9252BB511E5000ED006 /* StepperStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = D633B9242BB511E5000ED006 /* StepperStack.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -88,6 +89,7 @@
 		D633B9182BB15694000ED006 /* PhotoModelFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoModelFactory.swift; sourceTree = "<group>"; };
 		D633B91A2BB26E80000ED006 /* Updatable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Updatable.swift; sourceTree = "<group>"; };
 		D633B91C2BB3FB04000ED006 /* StepperControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StepperControl.swift; sourceTree = "<group>"; };
+		D633B9242BB511E5000ED006 /* StepperStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StepperStack.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -211,6 +213,7 @@
 				D615467E2BAA734E003E375A /* SettingsPanelViewController.swift */,
 				D61546842BAA7D75003E375A /* BackgroundStack.swift */,
 				D61546862BAA8880003E375A /* OpacityStack.swift */,
+				D633B9242BB511E5000ED006 /* StepperStack.swift */,
 				D633B91C2BB3FB04000ED006 /* StepperControl.swift */,
 			);
 			path = Settings;
@@ -375,6 +378,7 @@
 				D633B91B2BB26E80000ED006 /* Updatable.swift in Sources */,
 				D615466E2BA92ECF003E375A /* IDGenerator.swift in Sources */,
 				D61546762BA9F61A003E375A /* DrawableButton.swift in Sources */,
+				D633B9252BB511E5000ED006 /* StepperStack.swift in Sources */,
 				D615467F2BAA734E003E375A /* SettingsPanelViewController.swift in Sources */,
 				D61546722BA952D3003E375A /* ClampedRGB.swift in Sources */,
 				D61546642BA7D933003E375A /* Point.swift in Sources */,
