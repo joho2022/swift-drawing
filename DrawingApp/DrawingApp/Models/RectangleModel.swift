@@ -40,6 +40,10 @@ class RectangleModel: VisualComponent {
     func setPoint(_ newPoint: Point) {
         return self.point = newPoint
     }
+    
+    func setSize(_ newSize: Size) {
+        return self.size = newSize
+    }
 }
 
 extension RectangleModel: CustomStringConvertible {

@@ -39,6 +39,9 @@ class MainViewController: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(handleColorChanged(notification:)), name: .rectangleColorChanged, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(handleOpacityChanged(notification:)), name: .opacityChanged, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(handlePointUpdate(notification:)), name: .pointUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleSizeUpdate(notification:)), name: .sizeUpdated, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handlePositionChanged(notification:)), name: .positionChanged, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleSizeChanged(notification:)), name: .sizeChanged, object: nil)
     }
     
     private func addChild(_ child: UIViewController, _ frame: CGRect) {
@@ -79,6 +82,17 @@ extension MainViewController {
         let newY = CGFloat(newPoint.y)
         
         selectedView.frame = CGRect(x: newX, y: newY, width: selectedView.frame.size.width, height: selectedView.frame.size.height)
+    }
+    
+    @objc private func handleSizeUpdate(notification: Notification) {
+        guard let userInfo = notification.userInfo,
+              let uniqueID = userInfo["uniqueID"] as? UniqueID,
+              let newSize = userInfo["size"] as? Size,
+              let selectedView = viewRegistry[uniqueID] else { return }
+        let newWidth = newSize.width
+        let newheight = newSize.height
+        
+        selectedView.frame = CGRect(x: selectedView.frame.origin.x, y: selectedView.frame.origin.y, width: newWidth, height: newheight)
     }
     
     @objc private func handleCreateRectangle(notification: Notification) {
@@ -265,12 +279,16 @@ extension MainViewController: UIGestureRecognizerDelegate {
         switch sender.state {
         case .began:
             if let component = plane.hasComponent(at: selectedPoint), findView(for: component) == selectedView {
-                    createTemporaryView(from: selectedView)
+                createTemporaryView(from: selectedView)
             }
         case .changed:
             if let tempView = temporaryView {
                 let newFrame = CGRect(x: newX - (tempView.frame.size.width / 2), y: newY - (tempView.frame.size.height / 2),width: tempView.frame.size.width, height: tempView.frame.size.height)
                 temporaryView?.frame = newFrame
+                
+                self.settingsPanelViewController.pointStack.updateStepperValue(firstValue: newX - (tempView.frame.size.width / 2), secondValue: newY - (tempView.frame.size.height / 2))
+                
+                self.settingsPanelViewController.sizeStack.updateStepperValue(firstValue: tempView.frame.size.width, secondValue: tempView.frame.size.height)
             }
         case .ended, .cancelled:
             guard let selectedView = selectedView else { return }
@@ -279,11 +297,13 @@ extension MainViewController: UIGestureRecognizerDelegate {
             
             temporaryView?.removeFromSuperview()
             temporaryView = nil
+            
+            updateStepperValueTitle()
         default:
             break
         }
     }
-      
+    
     private func createTemporaryView(from selectedView: UIView?) {
         guard let selectedView = selectedView else { return }
         let snapshot = selectedView.snapshotView(afterScreenUpdates: true)
@@ -320,6 +340,7 @@ extension MainViewController: UIGestureRecognizerDelegate {
         }
         
         updateColorButtonTitle()
+        updateStepperValueTitle()
     }
     
     private func updateColorButtonTitle() {
@@ -333,6 +354,77 @@ extension MainViewController: UIGestureRecognizerDelegate {
             }
         } else {
             self.settingsPanelViewController.backgroundStack.updateColorButtonTitle(with: nil)
+        }
+    }
+    
+    private func updateStepperValueTitle() {
+        if let selectedView = selectedView,
+           let uniqueID = findKey(for: selectedView),
+           let component = plane.findComponent(uniqueID: uniqueID) {
+            let newX = Double(component.point.x)
+            let newY = Double(component.point.y)
+            let newWidth = Double(component.size.width)
+            let newHeight = Double(component.size.height)
+            
+            self.settingsPanelViewController.pointStack.updateStepperValue(firstValue: newX, secondValue: newY)
+            
+            self.settingsPanelViewController.sizeStack.updateStepperValue(firstValue: newWidth, secondValue: newHeight)
+        } else {
+            self.settingsPanelViewController.pointStack.updateStepperValue(firstValue: 0, secondValue: 0)
+            
+            self.settingsPanelViewController.sizeStack.updateStepperValue(firstValue: 0, secondValue: 0)
+        }
+    }
+    
+    @objc func handlePositionChanged(notification: Notification) {
+        guard let userInfo = notification.userInfo,
+              let value = userInfo["value"] as? Double,
+              let stepperType = userInfo["stepperType"] as? StepperType,
+              let selectedView = self.selectedView,
+              let uniqueID = self.findKey(for: selectedView) else { return }
+        
+        var newPosition: Point?
+        
+        switch stepperType {
+        case .positionX:
+            newPosition = Point(x: value, y: selectedView.frame.origin.y)
+            break
+        case .positionY:
+            newPosition = Point(x: selectedView.frame.origin.x, y: value)
+            break
+        default:
+            break
+        }
+        
+        if let newPosition = newPosition {
+            plane.updatePoint(uniqueID: uniqueID, point: newPosition)
+            
+        }
+    }
+    
+    @objc func handleSizeChanged(notification: Notification) {
+        guard let userInfo = notification.userInfo,
+              let value = userInfo["value"] as? Double,
+              let stepperType = userInfo["stepperType"] as? StepperType,
+              let selectedView = self.selectedView,
+              let uniqueID = self.findKey(for: selectedView) else { return }
+        
+        var newSize: Size?
+        
+        switch stepperType {
+        case .width:
+            newSize = Size(width: value, height: selectedView.frame.size.height)
+            break
+        case .height:
+            newSize = Size(width: selectedView.frame.size.width, height: value)
+            break
+        default:
+            break
+        }
+        
+        if let newSize = newSize {
+            plane.updateSize(uniqueID: uniqueID, size: newSize)
+            
         }
     }
 }
