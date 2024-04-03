@@ -8,12 +8,22 @@
 import Foundation
 
 protocol VisualComponent {
-    var point: Point { get }
-    var size: Size { get }
-    var backgroundColor: RGBColor? { get }
-    var uniqueID: UniqueID { get }
+    func getSize() -> Size
+    func getPoint() -> Point
+    func getColor() -> RGBColor?
+    func getUniqueID() -> UniqueID
     func contains(_ point: Point) -> Bool
     func setOpacity(_ newOpacity: Opacity)
     func setPoint(_ newPoint: Point)
     func setSize(_ newSize: Size)
+}
+
+extension VisualComponent where Self: Hashable {
+    static func == (lhs: Self, rhs: Self) -> Bool {
+        return lhs.getUniqueID() == rhs.getUniqueID()
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(getUniqueID())
+    }
 }
