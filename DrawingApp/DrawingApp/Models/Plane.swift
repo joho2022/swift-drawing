@@ -10,6 +10,7 @@ import UIKit
 import os
 
 extension Notification.Name {
+    static let labelCreated = Notification.Name("Plane.labelCreated")
     static let rectangleCreated = Notification.Name("Plane.rectangleCreated")
     static let rectangleColorChanged = Notification.Name("Plane.rectangleColorChanged")
     static let opacityChanged = Notification.Name("Plane.opacityChanged")
@@ -23,6 +24,7 @@ struct Plane: Updatable {
     private let logger = os.Logger(subsystem: "pro.DrawingApp.model", category: "Plane")
     private(set) var rectangles = [RectangleModel]()
     private(set) var photos = [PhotoModel]()
+    private(set) var labels = [Label]()
     
     var totalRectangles: Int {
         return rectangles.count
@@ -40,11 +42,34 @@ struct Plane: Updatable {
         
         logger.info("사각형 생성 명령하달!!")
         NotificationCenter.default.post(name: .rectangleCreated, object: nil, userInfo: ["rectModel": rectModel, "rectView": rectView])
-        
     }
     
     mutating func addRectangle(_ rectangle: RectangleModel) {
         rectangles.append(rectangle)
+    }
+    
+    func createLabelView(_ data: Label) {
+        let pointX = data.point.x
+        let pointY = data.point.y
+        let width = data.size.width
+        let height = data.size.height
+        
+        let red = CGFloat(data.backgroundColor!.red) / 255.0
+        let green = CGFloat(data.backgroundColor!.green) / 255.0
+        let blue = CGFloat(data.backgroundColor!.blue) / 255.0
+        let opacity = CGFloat(data.opacity.rawValue) / 10.0
+        
+        let labelView = UILabel(frame: CGRect(x: pointX, y: pointY, width: width, height: height))
+        labelView.text = data.text
+        labelView.font = .systemFont(ofSize: 35, weight: .bold)
+        labelView.textColor = UIColor(red: red, green: green, blue: blue, alpha: opacity)
+        logger.info("텍스트 생성 명령하달!!")
+        NotificationCenter.default.post(name: .labelCreated, object: nil, userInfo: ["labelModel": data, "labelView": labelView])
+    }
+    
+    mutating func addLabel(_ label: Label) {
+        labels.append(label)
+        print("텍스트 생성!!!! \(labels)")
     }
     
     mutating func updateRectangleColor(uniqueID: UniqueID) {
@@ -53,28 +78,38 @@ struct Plane: Updatable {
         if let index = rectangles.firstIndex(where: { $0.uniqueID == uniqueID }) {
             rectangles[index].setBackgroundColor(randomColor)
             
-            self.logger.info("배경색 변경 명령하달!")
-            NotificationCenter.default.post(name: .rectangleColorChanged, object: nil, userInfo: ["uniqueID": uniqueID, "randomColor": randomColor])
+            self.logger.info("사각형 배경색 변경 명령하달!")
+            NotificationCenter.default.post(name: .rectangleColorChanged, object: nil, userInfo: ["selectedModel": rectangles[index], "randomColor": randomColor])
+        } else if let index = labels.firstIndex(where: { $0.uniqueID == uniqueID }) {
+            self.logger.info("라벨 배경색 변경 명령하달!")
+            labels[index].setBackgroundColor(randomColor)
+            NotificationCenter.default.post(name: .rectangleColorChanged, object: nil, userInfo: ["selectedModel": labels[index], "randomColor": randomColor])
         }
     }
     
     mutating func updatePoint(uniqueID: UniqueID, point: Point) {
         if let index = rectangles.firstIndex(where: { $0.uniqueID == uniqueID }) {
             rectangles[index].setPoint(point)
-            NotificationCenter.default.post(name: .pointUpdated, object: nil, userInfo: ["uniqueID": uniqueID, "point": point])
+            NotificationCenter.default.post(name: .pointUpdated, object: nil, userInfo: ["selectedModel": rectangles[index], "point": point])
         } else if let index = photos.firstIndex(where: { $0.uniqueID == uniqueID }) {
             photos[index].setPoint(point)
-            NotificationCenter.default.post(name: .pointUpdated, object: nil, userInfo: ["uniqueID": uniqueID, "point": point])
+            NotificationCenter.default.post(name: .pointUpdated, object: nil, userInfo: ["selectedModel": photos[index], "point": point])
+        } else if let index = labels.firstIndex(where: { $0.uniqueID == uniqueID }) {
+            labels[index].setPoint(point)
+            NotificationCenter.default.post(name: .pointUpdated, object: nil, userInfo: ["selectedModel": labels[index], "point": point])
         }
     }
     
     mutating func updateSize(uniqueID: UniqueID, size: Size) {
         if let index = rectangles.firstIndex(where: { $0.uniqueID == uniqueID }) {
             rectangles[index].setSize(size)
-            NotificationCenter.default.post(name: .sizeUpdated, object: nil, userInfo: ["uniqueID": uniqueID, "size": size])
+            NotificationCenter.default.post(name: .sizeUpdated, object: nil, userInfo: ["selectedModel": rectangles[index], "size": size])
         } else if let index = photos.firstIndex(where: { $0.uniqueID == uniqueID }) {
             photos[index].setSize(size)
-            NotificationCenter.default.post(name: .sizeUpdated, object: nil, userInfo: ["uniqueID": uniqueID, "size": size])
+            NotificationCenter.default.post(name: .sizeUpdated, object: nil, userInfo: ["selectedModel": photos[index], "size": size])
+        } else if let index = labels.firstIndex(where: { $0.uniqueID == uniqueID }) {
+            labels[index].setSize(size)
+            NotificationCenter.default.post(name: .sizeUpdated, object: nil, userInfo: ["selectedModel": labels[index], "size": size])
         }
     }
     
@@ -82,21 +117,16 @@ struct Plane: Updatable {
         if let index = rectangles.firstIndex(where: { $0.uniqueID == uniqueID }) {
             rectangles[index].setOpacity(opacity)
             self.logger.info("사각형의 투명도 변경 명령하달!")
-            NotificationCenter.default.post(name: .opacityChanged, object: nil, userInfo: ["uniqueID": uniqueID, "opacity": opacity])
+            NotificationCenter.default.post(name: .opacityChanged, object: nil, userInfo: ["selectedModel": rectangles[index], "opacity": opacity])
         } else if let index = photos.firstIndex(where: { $0.uniqueID == uniqueID }) {
             photos[index].setOpacity(opacity)
             self.logger.info("사진의 투명도 변경 명령하달!")
-            NotificationCenter.default.post(name: .opacityChanged, object: nil, userInfo: ["uniqueID": uniqueID, "opacity": opacity])
+            NotificationCenter.default.post(name: .opacityChanged, object: nil, userInfo: ["selectedModel": photos[index], "opacity": opacity])
+        } else if let index = labels.firstIndex(where: { $0.uniqueID == uniqueID }) {
+            labels[index].setOpacity(opacity)
+            self.logger.info("텍스트 투명도 변경 명령하달!")
+            NotificationCenter.default.post(name: .opacityChanged, object: nil, userInfo: ["selectedModel": labels[index], "opacity": opacity])
         }
-    }
-    
-    func findComponent(uniqueID: UniqueID) -> VisualComponent? {
-        if let rect = rectangles.first(where: { $0.uniqueID == uniqueID }) {
-            return rect
-        } else if let photo = photos.first(where: { $0.uniqueID == uniqueID }) {
-            return photo
-        }
-        return nil
     }
     
     private func getRandomColor() -> RGBColor {
@@ -111,10 +141,13 @@ extension Plane {
             return rect
         } else if let photo = photos.first(where: { $0.contains(point) }) {
             return photo
+        } else if let label = labels.first(where: { $0.contains(point) }) {
+            return label
+        } else {
+            return nil
         }
-        return nil
     }
-    
+
     mutating func addPhoto(_ photo: PhotoModel) {
         return photos.append(photo)
     }

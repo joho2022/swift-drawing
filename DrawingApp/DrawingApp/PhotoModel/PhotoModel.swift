@@ -23,6 +23,22 @@ class PhotoModel: VisualComponent {
         self.opacity = opacity
     }
     
+    func getSize() -> Size {
+        return size
+    }
+    
+    func getPoint() -> Point {
+        return point
+    }
+    
+    func getColor() -> RGBColor? {
+        return backgroundColor
+    }
+    
+    func getUniqueID() -> UniqueID {
+        return uniqueID
+    }
+    
     func contains(_ point: Point) -> Bool {
         let horizontalRange = self.point.x..<(self.point.x + self.size.width)
         let verticalRange = self.point.y..<(self.point.y + self.size.height)
@@ -41,5 +57,11 @@ class PhotoModel: VisualComponent {
     
     func setSize(_ newSize: Size) {
         return self.size = newSize
+    }
+}
+
+extension PhotoModel: CustomStringConvertible {
+    var description: String {
+        return "(\(uniqueID.value)), X:\(point.x),Y:\(point.y), W\(size.width), H:\(size.height), R:\(backgroundColor?.red), G:\(backgroundColor?.green), B:\(backgroundColor?.blue), Alpha: \(opacity.rawValue)"
     }
 }

@@ -12,6 +12,7 @@ class DrawableButtonStack: UIStackView {
     
     let rectangleButton = DrawableButton(title: "사각형", image: UIImage(systemName: "rectangle"))
     let photoButton = DrawableButton(title: "사진", image: UIImage(systemName: "photo"))
+    let textButton = DrawableButton(title: "텍스트", image: UIImage(systemName:"textformat"))
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -28,7 +29,7 @@ class DrawableButtonStack: UIStackView {
         distribution = .fillEqually
         spacing = 5
         
-        [ rectangleButton, photoButton ].forEach { addArrangedSubview($0) }
+        [ rectangleButton, photoButton, textButton ].forEach { addArrangedSubview($0) }
     }
     
     // action에 nil을 주고 일시적으로 동작하지 않도록 생각한 방법
@@ -47,6 +48,15 @@ class DrawableButtonStack: UIStackView {
             photoButton.isEnabled = true
         } else {
             photoButton.isEnabled = false
+        }
+    }
+    
+    func setTextButtonAction(_ action: Selector?, target: Any?) {
+        if let action = action {
+            textButton.addTarget(target, action: action, for: .touchUpInside)
+            textButton.isEnabled = true
+        } else {
+            textButton.isEnabled = false
         }
     }
 }
