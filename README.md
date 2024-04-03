@@ -615,3 +615,166 @@ UIStepper 사용할려 했으나, 가로밖에 없어서 커스텀으로 버튼 
 
 </div>
 </details>
+
+<details>
+<summary>텍스트 추가하기</summary>
+
+## 🎯주요 작업
+
+- [x]  settingsPanelViewController에서 직접 notification을 받도록 개선하기
+- [x]  VisualComponent 자체를 key로 쓸 수 있는 방법도 생각하고 적용하기
+- [x]  드래그할 때 투명도 안생기는 버그 고치기
+- [x]  텍스트 추가하기
+    - [x]  랜덤한 위치 지정해서 위치부터 공백기준 5단어 표시하기
+
+## 📚학습 키워드
+
+- 내부속성을 쓰는 것보다 객체 자체를 Key로 사용하는 것이 좋음. 유니크아이디는 같아도 속성이 다를 수 있기 때문에~
+
+## 💻고민과 해결
+
+## 💁‍♂️`selectedView.frame.origin.x`는 하위까지 다 풀어쓰고 `newWidth`는 할당했는 데 일관성있게 하셔도 좋을 것 같네요
+
+### 🧙‍♂️나의 해결
+
+```swift
+// main뷰컨트롤러 handlePointUpdate메서드
+let newWidth = newSize.width
+let newheight = newSize.height
+let selectedViewOriginX = selectedView.frame.origin.x
+let selectedViewOriginY = selectedView.frame.origin.y
+        
+selectedView.frame = CGRect(x: selectedViewOriginX, y: selectedViewOriginY, width: newWidth, height: newheight)
+```
+
+## 💁‍♂️이 부분도 settingsPanelViewController에서 직접 notification을 받을 수 있지 않을까요?
+
+```swift
+// main뷰컨트롤러 handleColorChanged메서드 
+self.logger.info("배경색 변경 수신완료!")
+updateViewBackgroundColor(for: rectangleView, using: randomColor)       
+self.settingsPanelViewController.backgroundStack.updateColorButtonTitle(with: randomColor)
+```
+
+### 🧙‍♂️나의 해결
+
+```swift
+// 변경될 때 rectangleColorChanged 수신받으면 업데이트 하도록 함 
+// main과 setting 둘다 .rectangleColorChanged 수신받음
+@objc private func handleColorChanged(notification: Notification) {
+        guard let randomColor = notification.userInfo?["randomColor"] as? RGBColor else { return }
+        
+        self.logger.info("배경색 변경 수신완료(Setting)!")
+        backgroundStack.updateColorButtonTitle(with: randomColor)
+    }
+```
+
+## 💁‍♂️uniqueID를 key로 쓸수도 있지만, VisualComponent 자체를 key로 쓸 수 있는 방법도 생각해보세요.
+
+```swift
+private func findView(for component: VisualComponent) -> UIView? {
+        return viewRegistry[component.uniqueID]
+```
+
+### 🧙‍♂️나의 해결
+
+현재 Swift의 타입 시스템에서는 프로토콜 자체에 직접 **`Hashable`**을 채택할 수 없으며, 이는 구조적 한계로 인해 프로토콜 타입은 **`Hashable`**을 직접 채택할 수 없다.
+
+"제네릭 프로토콜"을 콜렉션 타입으로 설정하면 컴파일 에러 발생
+
+```swift
+// 타입소거를 사용하여 키값으로 사용하고자 함.
+struct AnyVisualComponent: Hashable {
+    private(set) var component: VisualComponent
+    
+    init(_ component: VisualComponent) {
+        self.component = component
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(ObjectIdentifier(type(of: component)))
+        hasher.combine(component.getUniqueID())
+    }
+    
+    static func == (lhs: AnyVisualComponent, rhs: AnyVisualComponent) -> Bool {
+        return lhs.component.getUniqueID() == rhs.component.getUniqueID()
+    }
+}
+```
+
+ **`VisualComponent`** 프로토콜을 준수하는 어떤 객체든지 **`viewRegistry`** 딕셔너리의 키로 사용할 수 있도록  **`AnyVisualComponent`**는 내부적으로 **`VisualComponent`** 프로토콜을 준수하는 객체를 감싸고, 이를 통해 **`Hashable`** 프로토콜 요구사항을 만족시키며, 딕셔너리의 키로 사용하여 해결하고자 함.
+
+**[고민]**속성에 직접 접근하는 대신, 값을 가져오거나 설정하는 메서드를 프로토콜에 정의하는 방법을 생각했는데, 데이터관리를 할 때 사진모델과 사각형모델을 구분하지 않고 공통된 프로토콜을 채택하는 객체를 키값으로 데이터 관리하고 싶은데, 이때 get set구조를 하지 않고 객체지향 원칙을 지키면서 앱 돌아가는 구조에 대해 견문이 부족하여.. 방법이 떠오르지 않습니다.. 여러 방법을 모색했지만 결국 프로토콜에 get set구조가 선언되는 방법만 떠오릅니다.….💧😭😢😿🥲💦
+
+## 💁‍♂️이 메소드는 settingsPanelViewController에 있어도 될 것 같은 내용이 많은 것 같습니다. 어떻게 생각해요?
+
+```swift
+// main뷰컨트롤러 viewTapped메서드 안에
+        updateColorButtonTitle()
+        updateStepperValueTitle()
+    }
+    
+    private func updateColorButtonTitle() {
+        if let selectedView = selectedView,
+           let uniqueID = findKey(for: selectedView),
+           let component = plane.findComponent(uniqueID: uniqueID) {
+            if let color = component.backgroundColor {
+                self.settingsPanelViewController.backgroundStack.updateColorButtonTitle(with: color)
+            } else {
+                self.settingsPanelViewController.backgroundStack.updateColorButtonTitle(with: nil)
+            }
+        } else {
+            self.settingsPanelViewController.backgroundStack.updateColorButtonTitle(with: nil)
+        }
+    }
+    
+    private func updateStepperValueTitle() {
+        if let selectedView = selectedView,
+           let uniqueID = findKey(for: selectedView),
+           let component = plane.findComponent(uniqueID: uniqueID) {
+            let newX = Double(component.point.x)
+            let newY = Double(component.point.y)
+            let newWidth = Double(component.size.width)
+            let newHeight = Double(component.size.height)
+            
+            self.settingsPanelViewController.pointStack.updateStepperValue(firstValue: newX, secondValue: newY)
+            
+            self.settingsPanelViewController.sizeStack.updateStepperValue(firstValue: newWidth, secondValue: newHeight)
+        } else {
+            self.settingsPanelViewController.pointStack.updateStepperValue(firstValue: 0, secondValue: 0)
+            
+            self.settingsPanelViewController.sizeStack.updateStepperValue(firstValue: 0, secondValue: 0)
+        }
+    }
+```
+
+### 🧙‍♂️나의 해결
+
+```swift
+// setting뷰컨트롤러 
+func updateUIForSelectedComponent(_ component: VisualComponent?) {
+        updateColorButtonTitle(with: component?.getColor())
+        updateStepperValues(with: component)
+    }
+
+private func updateColorButtonTitle(with color: RGBColor?) {
+        let color = color ?? nil
+        backgroundStack.updateColorButtonTitle(with: color)
+    }
+    
+private func updateStepperValues(with component: VisualComponent?) {
+        let positionX = component?.getPoint().x ?? 0
+        let positionY = component?.getPoint().y ?? 0
+        let width = component?.getSize().width ?? 0
+        let height = component?.getSize().height ?? 0
+        
+        pointStack.updateStepperValue(firstValue: Double(positionX), secondValue: Double(positionY))
+        sizeStack.updateStepperValue(firstValue: Double(width), secondValue: Double(height))
+    }
+```
+
+## 🤔결과
+![텍스트추가하기](https://github.com/codesquad-members-2024/swift-drawing/assets/104732020/22345222-e5f8-4914-9e58-936f2e9f3394)
+
+</div>
+</details>
