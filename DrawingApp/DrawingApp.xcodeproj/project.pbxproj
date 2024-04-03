@@ -37,6 +37,9 @@
 		D633B91B2BB26E80000ED006 /* Updatable.swift in Sources */ = {isa = PBXBuildFile; fileRef = D633B91A2BB26E80000ED006 /* Updatable.swift */; };
 		D633B91D2BB3FB04000ED006 /* StepperControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = D633B91C2BB3FB04000ED006 /* StepperControl.swift */; };
 		D633B9252BB511E5000ED006 /* StepperStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = D633B9242BB511E5000ED006 /* StepperStack.swift */; };
+		D633B9272BB6819F000ED006 /* Label.swift in Sources */ = {isa = PBXBuildFile; fileRef = D633B9262BB6819F000ED006 /* Label.swift */; };
+		D633B9292BBAA7FB000ED006 /* AnyVisualComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = D633B9282BBAA7FB000ED006 /* AnyVisualComponent.swift */; };
+		D633B92E2BBBD410000ED006 /* LabelFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = D633B92D2BBBD410000ED006 /* LabelFactory.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -90,6 +93,9 @@
 		D633B91A2BB26E80000ED006 /* Updatable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Updatable.swift; sourceTree = "<group>"; };
 		D633B91C2BB3FB04000ED006 /* StepperControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StepperControl.swift; sourceTree = "<group>"; };
 		D633B9242BB511E5000ED006 /* StepperStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StepperStack.swift; sourceTree = "<group>"; };
+		D633B9262BB6819F000ED006 /* Label.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Label.swift; sourceTree = "<group>"; };
+		D633B9282BBAA7FB000ED006 /* AnyVisualComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnyVisualComponent.swift; sourceTree = "<group>"; };
+		D633B92D2BBBD410000ED006 /* LabelFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelFactory.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -147,6 +153,7 @@
 				D61546752BA9F61A003E375A /* DrawableButton.swift */,
 				D61546772BAA0866003E375A /* DrawableButtonStack.swift */,
 				D61546832BAA7D5A003E375A /* Settings */,
+				D633B92C2BBBC0FF000ED006 /* LabelModel */,
 				D633B9152BB15067000ED006 /* PhotoModel */,
 				D61546682BA7DDE7003E375A /* Models */,
 				D61546672BA7DDDF003E375A /* ShapeProperties */,
@@ -222,6 +229,7 @@
 		D633B9142BB14FBB000ED006 /* Protocol */ = {
 			isa = PBXGroup;
 			children = (
+				D633B9282BBAA7FB000ED006 /* AnyVisualComponent.swift */,
 				D633B9122BB14FB4000ED006 /* VisualComponent.swift */,
 				D633B91A2BB26E80000ED006 /* Updatable.swift */,
 			);
@@ -235,6 +243,15 @@
 				D633B9182BB15694000ED006 /* PhotoModelFactory.swift */,
 			);
 			path = PhotoModel;
+			sourceTree = "<group>";
+		};
+		D633B92C2BBBC0FF000ED006 /* LabelModel */ = {
+			isa = PBXGroup;
+			children = (
+				D633B9262BB6819F000ED006 /* Label.swift */,
+				D633B92D2BBBD410000ED006 /* LabelFactory.swift */,
+			);
+			path = LabelModel;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -376,14 +393,17 @@
 				D61546872BAA8880003E375A /* OpacityStack.swift in Sources */,
 				D61546622BA7D90F003E375A /* Size.swift in Sources */,
 				D633B91B2BB26E80000ED006 /* Updatable.swift in Sources */,
+				D633B92E2BBBD410000ED006 /* LabelFactory.swift in Sources */,
 				D615466E2BA92ECF003E375A /* IDGenerator.swift in Sources */,
 				D61546762BA9F61A003E375A /* DrawableButton.swift in Sources */,
 				D633B9252BB511E5000ED006 /* StepperStack.swift in Sources */,
 				D615467F2BAA734E003E375A /* SettingsPanelViewController.swift in Sources */,
 				D61546722BA952D3003E375A /* ClampedRGB.swift in Sources */,
+				D633B9272BB6819F000ED006 /* Label.swift in Sources */,
 				D61546642BA7D933003E375A /* Point.swift in Sources */,
 				D61546662BA7D94F003E375A /* RGBColor.swift in Sources */,
 				D615466A2BA7E7C4003E375A /* RectangleModelFactory.swift in Sources */,
+				D633B9292BBAA7FB000ED006 /* AnyVisualComponent.swift in Sources */,
 				D61546812BAA7697003E375A /* CGRect+.swift in Sources */,
 				D633B91D2BB3FB04000ED006 /* StepperControl.swift in Sources */,
 				D61546602BA7D6E0003E375A /* RectangleModel.swift in Sources */,
