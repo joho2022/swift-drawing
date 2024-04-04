@@ -15,8 +15,7 @@ class MainViewController: UIViewController {
     private var selectedView: UIView?
     private var temporaryView: UIView?
     
-    private var viewRegistry: [AnyVisualComponent: UIView] = [:]
-    
+    private var viewRegistry: [BaseRect: UIView] = [:]
     private var plane = Plane()
     private var factory = RectangleFactory()
     private var photoFactory = PhotoFactory()
@@ -74,14 +73,14 @@ extension MainViewController {
     
     @objc private func rectangleButtonTapped() {
         let rectangleModel = createRectangleData()
-        plane.createRectangleView(rectangleModel)
+        ViewFactory.createRectangleView(rectangleModel)
     }
     
     @objc private func handlePointUpdate(notification: Notification) {
         guard let userInfo = notification.userInfo,
-              let selectedModel = userInfo["selectedModel"] as? VisualComponent,
+              let selectedModel = userInfo["selectedModel"] as? BaseRect,
               let newPoint = userInfo["point"] as? Point,
-              let selectedView = viewRegistry[AnyVisualComponent(selectedModel)] else { return }
+              let selectedView = viewRegistry[selectedModel] else { return }
         let newX = CGFloat(newPoint.x)
         let newY = CGFloat(newPoint.y)
         
@@ -90,9 +89,9 @@ extension MainViewController {
     
     @objc private func handleSizeUpdate(notification: Notification) {
         guard let userInfo = notification.userInfo,
-              let selectedModel = userInfo["selectedModel"] as? VisualComponent,
+              let selectedModel = userInfo["selectedModel"] as? BaseRect,
               let newSize = userInfo["size"] as? Size,
-        let selectedView = viewRegistry[AnyVisualComponent(selectedModel)] else { return }
+        let selectedView = viewRegistry[selectedModel] else { return }
         let newWidth = newSize.width
         let newheight = newSize.height
         let selectedViewOriginX = selectedView.frame.origin.x
@@ -123,9 +122,9 @@ extension MainViewController {
     
     @objc private func handleColorChanged(notification: Notification) {
         guard let userInfo = notification.userInfo,
-              let selectedModel = userInfo["selectedModel"] as? VisualComponent,
+              let selectedModel = userInfo["selectedModel"] as? BaseRect,
               let randomColor = userInfo["randomColor"] as? RGBColor,
-              let selectedView = viewRegistry[AnyVisualComponent(selectedModel)] else { return }
+              let selectedView = viewRegistry[selectedModel] else { return }
         
         self.logger.info("배경색 변경 수신완료(Main)!")
         updateViewBackgroundColor(for: selectedView, using: randomColor)
@@ -133,9 +132,9 @@ extension MainViewController {
     
     @objc private func handleOpacityChanged(notification: Notification) {
         guard let userInfo = notification.userInfo,
-              let selectedModel = userInfo["selectedModel"] as? VisualComponent,
+              let selectedModel = userInfo["selectedModel"] as? BaseRect,
               let newOpacity = userInfo["opacity"] as? Opacity,
-              let selectedView = viewRegistry[AnyVisualComponent(selectedModel)] else { return }
+              let selectedView = viewRegistry[selectedModel] else { return }
         
         updateViewOpacity(for: selectedView, using: newOpacity)
     }
@@ -148,7 +147,7 @@ extension MainViewController {
                 return
             }
             let selectedModel = findComponent(for: selectedRectangleView)!
-            plane.updateRectangleColor(uniqueID: selectedModel.getUniqueID())
+            plane.updateRectangleColor(uniqueID: selectedModel.uniqueID)
         }
     }
     
@@ -161,26 +160,26 @@ extension MainViewController {
             }
             
             if let selectedModel = self.findComponent(for: selectedView) {
-                plane.updateOpacity(uniqueID: selectedModel.getUniqueID(), opacity: newOpacity)
+                plane.updateOpacity(uniqueID: selectedModel.uniqueID, opacity: newOpacity)
                 self.logger.info("투명도 업데이트!")
             }
         }
     }
     
-    private func addViews(for view: UIView, with model: VisualComponent) {
-        viewRegistry[AnyVisualComponent(model)] = view
+    private func addViews(for view: UIView, with model: BaseRect) {
+        viewRegistry[model] = view
         
         logger.info("생성된 키는\(self.viewRegistry.keys)")
         self.view.addSubview(view)
     }
     
-    private func findView(for component: any VisualComponent) -> UIView? {
-        return viewRegistry[AnyVisualComponent(component)]
+    private func findView(for component: BaseRect) -> UIView? {
+        return viewRegistry[component]
     }
     
-    private func findComponent(for view: UIView) -> VisualComponent? {
+    private func findComponent(for view: UIView) -> BaseRect? {
         let result = viewRegistry.first(where: { $0.value === view })
-        return result?.key.component
+        return result?.key
     }
     
     private func updateViewBackgroundColor(for view: UIView, using color: RGBColor) {
@@ -237,7 +236,7 @@ extension MainViewController: UIImagePickerControllerDelegate, UINavigationContr
                 return
             }
             let photoModel = self.createPhotoData(with: imageData)
-            self.plane.createImageView(photoModel)
+            ViewFactory.createImageView(photoModel)
         }
     }
     
@@ -264,7 +263,7 @@ extension MainViewController: UIImagePickerControllerDelegate, UINavigationContr
     @objc private func textButtonTapped() {
         logger.info("텍스트 버튼 Tapped!")
         let labelData = createTextData()
-        plane.createLabelView(labelData)
+        ViewFactory.createLabelView(labelData)
         
     }
     
@@ -313,14 +312,13 @@ extension MainViewController: UIGestureRecognizerDelegate {
             }
         case .changed:
             if let tempView = temporaryView {
-                NotificationCenter.default.post(name: .componentPositionChanged, object: self, userInfo: [
-                    "tempView": tempView,
-                    "newX": newX - (tempView.frame.size.width / 2),
-                    "newY": newY - (tempView.frame.size.height / 2),
-                    "width": tempView.frame.size.width,
-                    "height": tempView.frame.size.height
-                ])
-                
+                let newX = newX - (tempView.frame.size.width / 2)
+                let newY = newY - (tempView.frame.size.height / 2)
+                let width = tempView.frame.size.width
+                let height = tempView.frame.size.height
+                let newFrame = CGRect(x: newX, y: newY,width: width, height: height)
+                settingsPanelViewController.pointStack.updateStepperTempValue(firstValue: newX, secondValue: newY)
+                temporaryView?.frame = newFrame
             }
         case .ended, .cancelled:
             guard let selectedView = selectedView else { return }
@@ -351,7 +349,7 @@ extension MainViewController: UIGestureRecognizerDelegate {
     
     private func updateModelPosition(for selectedView: UIView, to newPoint: Point) {
         if let selectedModel = findComponent(for: selectedView) {
-            plane.updatePoint(uniqueID: selectedModel.getUniqueID(), point: newPoint)
+            plane.updatePoint(uniqueID: selectedModel.uniqueID, point: newPoint)
         }
     }
     
@@ -396,8 +394,7 @@ extension MainViewController: UIGestureRecognizerDelegate {
         }
         
         if let newPosition = newPosition {
-            plane.updatePoint(uniqueID: selectedModel.getUniqueID(), point: newPosition)
-            
+            plane.updatePoint(uniqueID: selectedModel.uniqueID, point: newPosition)
         }
     }
     
@@ -422,7 +419,7 @@ extension MainViewController: UIGestureRecognizerDelegate {
         }
         
         if let newSize = newSize {
-            plane.updateSize(uniqueID: selectedModel.getUniqueID(), size: newSize)
+            plane.updateSize(uniqueID: selectedModel.uniqueID, size: newSize)
         }
     }
 }

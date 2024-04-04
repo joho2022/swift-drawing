@@ -86,4 +86,10 @@ class StepperStack: UIStackView {
         secondLabel.text = "\(Int(secondValue))"
         secondStepper.value = secondValue
     }
+    
+    func updateStepperTempValue(firstValue: Double, secondValue: Double) {
+        firstLabel.text = "\(Int(firstValue))"
+
+        secondLabel.text = "\(Int(secondValue))"
+    }
 }

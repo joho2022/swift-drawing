@@ -7,32 +7,12 @@
 
 import Foundation
 
-class PhotoModel: VisualComponent {
-    private(set) var backgroundColor: RGBColor? = nil
-    private(set) var uniqueID: UniqueID
+class PhotoModel: BaseRect, VisualComponent  {
     private(set) var imageData: Data
-    private(set) var size : Size
-    private(set) var point: Point
-    private(set) var opacity: Opacity
     
     init(uniqueID: UniqueID, imageData: Data, size: Size, point: Point, opacity: Opacity) {
-        self.uniqueID = uniqueID
         self.imageData = imageData
-        self.size = size
-        self.point = point
-        self.opacity = opacity
-    }
-    
-    func getSize() -> Size {
-        return size
-    }
-    
-    func getPoint() -> Point {
-        return point
-    }
-    
-    func getColor() -> RGBColor? {
-        return backgroundColor
+        super.init(uniqueID: uniqueID, size: size, point: point, opacity: opacity)
     }
     
     func getUniqueID() -> UniqueID {
@@ -45,23 +25,11 @@ class PhotoModel: VisualComponent {
         
         return horizontalRange.contains(point.x) && verticalRange.contains(point.y)
     }
-    
-    func setOpacity(_ newOpacity: Opacity) {
-        return self.opacity = newOpacity
-    }
-    
-    
-    func setPoint(_ newPoint: Point) {
-        return self.point = newPoint
-    }
-    
-    func setSize(_ newSize: Size) {
-        return self.size = newSize
-    }
 }
 
 extension PhotoModel: CustomStringConvertible {
     var description: String {
-        return "(\(uniqueID.value)), X:\(point.x),Y:\(point.y), W\(size.width), H:\(size.height), R:\(backgroundColor?.red), G:\(backgroundColor?.green), B:\(backgroundColor?.blue), Alpha: \(opacity.rawValue)"
+        return "(\(uniqueID.value)), imageData:\(imageData) X:\(point.x),Y:\(point.y), W\(size.width), H:\(size.height), Alpha: \(opacity.rawValue)"
     }
 }
+
