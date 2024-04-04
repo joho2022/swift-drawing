@@ -16,10 +16,10 @@ class MainViewController: UIViewController {
     private var temporaryView: UIView?
     
     private var viewRegistry: [BaseRect: UIView] = [:]
-    private var plane = Plane()
-    private var factory = RectangleFactory()
-    private var photoFactory = PhotoFactory()
-    private var textFactory = LabelFactory()
+    private var plane: Plane!
+    private var factory: RectangleFactory!
+    private var photoFactory: PhotoFactory!
+    private var textFactory: LabelFactory!
     
     private let drawableButtonStack = DrawableButtonStack()
     private let settingsPanelViewController = SettingsPanelViewController()
@@ -28,7 +28,6 @@ class MainViewController: UIViewController {
         super.viewDidLoad()
         let settingsFrame = view.bounds.with(width: 200)
         addChild(settingsPanelViewController, settingsFrame)
-        
         setupGesture()
         setupOpacityAction()
         setupBackgroundAction()
@@ -50,6 +49,13 @@ class MainViewController: UIViewController {
         child.view.frame = frame
         view.addSubview(child.view)
         child.didMove(toParent: self)
+    }
+    
+    func injectDependencies(plane: Plane, rectangleFactory: RectangleFactory, photoFactory: PhotoFactory, labelFactory: LabelFactory) {
+        self.plane = plane
+        self.factory = rectangleFactory
+        self.photoFactory = photoFactory
+        self.textFactory = labelFactory
     }
 }
 

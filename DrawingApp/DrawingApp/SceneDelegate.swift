@@ -16,11 +16,17 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         guard let windowScene = (scene as? UIWindowScene) else { return }
         
+        let mainVC = MainViewController()
+        mainVC.injectDependencies(plane: Plane(),
+                                  rectangleFactory: RectangleFactory(),
+                                  photoFactory: PhotoFactory(),
+                                  labelFactory: LabelFactory()
+        )
+        
         let window = UIWindow(windowScene: windowScene)
         window.backgroundColor = .white
-        window.rootViewController = MainViewController()
+        window.rootViewController = mainVC
         self.window = window
         window.makeKeyAndVisible()
     }
-    
 }
