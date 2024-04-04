@@ -153,7 +153,7 @@ extension MainViewController {
                 return
             }
             let selectedModel = findComponent(for: selectedRectangleView)!
-            plane.updateRectangleColor(uniqueID: selectedModel.uniqueID)
+            plane.updateRectangleColor(for: selectedModel)
         }
     }
     
@@ -166,7 +166,7 @@ extension MainViewController {
             }
             
             if let selectedModel = self.findComponent(for: selectedView) {
-                plane.updateOpacity(uniqueID: selectedModel.uniqueID, opacity: newOpacity)
+                plane.updateOpacity(for: selectedModel, opacity: newOpacity)
                 self.logger.info("투명도 업데이트!")
             }
         }
@@ -355,7 +355,7 @@ extension MainViewController: UIGestureRecognizerDelegate {
     
     private func updateModelPosition(for selectedView: UIView, to newPoint: Point) {
         if let selectedModel = findComponent(for: selectedView) {
-            plane.updatePoint(uniqueID: selectedModel.uniqueID, point: newPoint)
+            plane.updatePoint(for: selectedModel, point: newPoint)
         }
     }
     
@@ -400,7 +400,7 @@ extension MainViewController: UIGestureRecognizerDelegate {
         }
         
         if let newPosition = newPosition {
-            plane.updatePoint(uniqueID: selectedModel.uniqueID, point: newPosition)
+            plane.updatePoint(for: selectedModel, point: newPosition)
         }
     }
     
@@ -425,7 +425,7 @@ extension MainViewController: UIGestureRecognizerDelegate {
         }
         
         if let newSize = newSize {
-            plane.updateSize(uniqueID: selectedModel.uniqueID, size: newSize)
+            plane.updateSize(for: selectedModel, size: newSize)
         }
     }
 }

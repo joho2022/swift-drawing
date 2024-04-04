@@ -8,6 +8,6 @@
 import Foundation
 
 protocol Updatable {
-    mutating func updateOpacity(uniqueID: UniqueID, opacity: Opacity)
-    mutating func updatePoint(uniqueID: UniqueID, point: Point)
+    mutating func updateOpacity(for model: BaseRect, opacity: Opacity)
+    mutating func updatePoint(for model: BaseRect, point: Point)
 }

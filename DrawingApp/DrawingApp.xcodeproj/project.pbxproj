@@ -38,7 +38,6 @@
 		D633B91D2BB3FB04000ED006 /* StepperControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = D633B91C2BB3FB04000ED006 /* StepperControl.swift */; };
 		D633B9252BB511E5000ED006 /* StepperStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = D633B9242BB511E5000ED006 /* StepperStack.swift */; };
 		D633B9272BB6819F000ED006 /* Label.swift in Sources */ = {isa = PBXBuildFile; fileRef = D633B9262BB6819F000ED006 /* Label.swift */; };
-		D633B9292BBAA7FB000ED006 /* AnyVisualComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = D633B9282BBAA7FB000ED006 /* AnyVisualComponent.swift */; };
 		D633B92E2BBBD410000ED006 /* LabelFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = D633B92D2BBBD410000ED006 /* LabelFactory.swift */; };
 		D633B9352BBE3B0C000ED006 /* ViewFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = D633B9342BBE3B0C000ED006 /* ViewFactory.swift */; };
 /* End PBXBuildFile section */
@@ -95,7 +94,6 @@
 		D633B91C2BB3FB04000ED006 /* StepperControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StepperControl.swift; sourceTree = "<group>"; };
 		D633B9242BB511E5000ED006 /* StepperStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StepperStack.swift; sourceTree = "<group>"; };
 		D633B9262BB6819F000ED006 /* Label.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Label.swift; sourceTree = "<group>"; };
-		D633B9282BBAA7FB000ED006 /* AnyVisualComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnyVisualComponent.swift; sourceTree = "<group>"; };
 		D633B92D2BBBD410000ED006 /* LabelFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelFactory.swift; sourceTree = "<group>"; };
 		D633B9342BBE3B0C000ED006 /* ViewFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewFactory.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -232,7 +230,6 @@
 		D633B9142BB14FBB000ED006 /* Protocol */ = {
 			isa = PBXGroup;
 			children = (
-				D633B9282BBAA7FB000ED006 /* AnyVisualComponent.swift */,
 				D633B9122BB14FB4000ED006 /* VisualComponent.swift */,
 				D633B91A2BB26E80000ED006 /* Updatable.swift */,
 			);
@@ -406,7 +403,6 @@
 				D61546642BA7D933003E375A /* Point.swift in Sources */,
 				D61546662BA7D94F003E375A /* RGBColor.swift in Sources */,
 				D615466A2BA7E7C4003E375A /* RectangleModelFactory.swift in Sources */,
-				D633B9292BBAA7FB000ED006 /* AnyVisualComponent.swift in Sources */,
 				D61546812BAA7697003E375A /* CGRect+.swift in Sources */,
 				D633B91D2BB3FB04000ED006 /* StepperControl.swift in Sources */,
 				D61546602BA7D6E0003E375A /* RectangleModel.swift in Sources */,

@@ -43,7 +43,8 @@ struct Plane: Updatable {
         print("텍스트 생성!!!! \(labels)")
     }
     
-    mutating func updateRectangleColor(uniqueID: UniqueID) {
+    mutating func updateRectangleColor(for model: BaseRect) {
+        let uniqueID = model.uniqueID
         let randomColor = getRandomColor()
         
         if let index = rectangles.firstIndex(where: { $0.uniqueID == uniqueID }) {
@@ -58,7 +59,8 @@ struct Plane: Updatable {
         }
     }
     
-    mutating func updatePoint(uniqueID: UniqueID, point: Point) {
+    mutating func updatePoint(for model: BaseRect, point: Point) {
+        let uniqueID = model.uniqueID
         if let index = rectangles.firstIndex(where: { $0.uniqueID == uniqueID }) {
             rectangles[index].setPoint(point)
             NotificationCenter.default.post(name: .pointUpdated, object: nil, userInfo: ["selectedModel": rectangles[index], "point": point])
@@ -71,7 +73,8 @@ struct Plane: Updatable {
         }
     }
     
-    mutating func updateSize(uniqueID: UniqueID, size: Size) {
+    mutating func updateSize(for model: BaseRect, size: Size) {
+        let uniqueID = model.uniqueID
         if let index = rectangles.firstIndex(where: { $0.uniqueID == uniqueID }) {
             rectangles[index].setSize(size)
             NotificationCenter.default.post(name: .sizeUpdated, object: nil, userInfo: ["selectedModel": rectangles[index], "size": size])
@@ -84,7 +87,8 @@ struct Plane: Updatable {
         }
     }
     
-    mutating func updateOpacity(uniqueID: UniqueID, opacity: Opacity) {
+    mutating func updateOpacity(for model: BaseRect, opacity: Opacity) {
+        let uniqueID = model.uniqueID
         if let index = rectangles.firstIndex(where: { $0.uniqueID == uniqueID }) {
             rectangles[index].setOpacity(opacity)
             self.logger.info("사각형의 투명도 변경 명령하달!")

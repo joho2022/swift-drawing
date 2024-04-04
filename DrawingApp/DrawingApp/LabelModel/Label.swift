@@ -31,6 +31,6 @@ class Label: BaseRect, VisualComponent, RectColorful {
 
 extension Label: CustomStringConvertible {
     var description: String {
-        return "(\(uniqueID.value)), X:\(point.x),Y:\(point.y), W\(size.width), H:\(size.height), R:\(backgroundColor.red), G:\(backgroundColor.green), B:\(backgroundColor.blue), Alpha: \(opacity.rawValue), text: \(text)"
+        return "(\(self.hashValue)), X:\(point.x),Y:\(point.y), W\(size.width), H:\(size.height), R:\(backgroundColor.red), G:\(backgroundColor.green), B:\(backgroundColor.blue), Alpha: \(opacity.rawValue), text: \(text)"
     }
 }
