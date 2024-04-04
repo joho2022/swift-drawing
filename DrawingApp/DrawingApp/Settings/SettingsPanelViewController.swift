@@ -9,10 +9,6 @@ import UIKit
 import SnapKit
 import os
 
-extension Notification.Name {
-    static let componentPositionChanged = Notification.Name("SettingsPanelViewController.componentPositionChanged")
-}
-
 class SettingsPanelViewController: UIViewController {
     private let logger = os.Logger(subsystem: "pro.DrawingApp.model", category: "BackgroundStack")
     
@@ -31,7 +27,6 @@ class SettingsPanelViewController: UIViewController {
         setupView()
         
         NotificationCenter.default.addObserver(self, selector: #selector(handleColorChanged(notification:)), name: .rectangleColorChanged, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(handleComponentPositionChanged(notification:)), name: .componentPositionChanged, object: nil)
     }
     
     @objc private func handleColorChanged(notification: Notification) {
@@ -41,20 +36,8 @@ class SettingsPanelViewController: UIViewController {
         backgroundStack.updateColorButtonTitle(with: randomColor)
     }
     
-    @objc private func handleComponentPositionChanged(notification: Notification) {
-        guard let userInfo = notification.userInfo,
-              let tempView = userInfo["tempView"] as? UIView,
-              let newX = userInfo["newX"] as? CGFloat,
-              let newY = userInfo["newY"] as? CGFloat,
-              let width = userInfo["width"] as? CGFloat,
-              let height = userInfo["height"] as? CGFloat else { return }
-        
-        pointStack.updateStepperValue(firstValue: newX, secondValue: newY)
-        sizeStack.updateStepperValue(firstValue: width, secondValue: height)
-    }
-    
-    func updateUIForSelectedComponent(_ component: VisualComponent?) {
-        updateColorButtonTitle(with: component?.getColor())
+    func updateUIForSelectedComponent(_ component: BaseRect?) {
+        updateColorButtonTitle(with: (component as? RectColorful)?.backgroundColor)
         updateStepperValues(with: component)
     }
 }
@@ -121,11 +104,11 @@ extension SettingsPanelViewController {
         backgroundStack.updateColorButtonTitle(with: color)
     }
     
-    private func updateStepperValues(with component: VisualComponent?) {
-        let positionX = component?.getPoint().x ?? 0
-        let positionY = component?.getPoint().y ?? 0
-        let width = component?.getSize().width ?? 0
-        let height = component?.getSize().height ?? 0
+    private func updateStepperValues(with component: BaseRect?) {
+        let positionX = component?.point.x ?? 0
+        let positionY = component?.point.y ?? 0
+        let width = component?.size.width ?? 0
+        let height = component?.size.height ?? 0
         
         pointStack.updateStepperValue(firstValue: Double(positionX), secondValue: Double(positionY))
         sizeStack.updateStepperValue(firstValue: Double(width), secondValue: Double(height))

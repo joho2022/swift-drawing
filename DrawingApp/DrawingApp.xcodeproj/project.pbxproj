@@ -40,6 +40,7 @@
 		D633B9272BB6819F000ED006 /* Label.swift in Sources */ = {isa = PBXBuildFile; fileRef = D633B9262BB6819F000ED006 /* Label.swift */; };
 		D633B9292BBAA7FB000ED006 /* AnyVisualComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = D633B9282BBAA7FB000ED006 /* AnyVisualComponent.swift */; };
 		D633B92E2BBBD410000ED006 /* LabelFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = D633B92D2BBBD410000ED006 /* LabelFactory.swift */; };
+		D633B9352BBE3B0C000ED006 /* ViewFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = D633B9342BBE3B0C000ED006 /* ViewFactory.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -96,6 +97,7 @@
 		D633B9262BB6819F000ED006 /* Label.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Label.swift; sourceTree = "<group>"; };
 		D633B9282BBAA7FB000ED006 /* AnyVisualComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnyVisualComponent.swift; sourceTree = "<group>"; };
 		D633B92D2BBBD410000ED006 /* LabelFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelFactory.swift; sourceTree = "<group>"; };
+		D633B9342BBE3B0C000ED006 /* ViewFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewFactory.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -150,6 +152,7 @@
 				D615462F2BA7D07D003E375A /* AppDelegate.swift */,
 				D61546312BA7D07D003E375A /* SceneDelegate.swift */,
 				D615467C2BAA730A003E375A /* MainViewController.swift */,
+				D633B9342BBE3B0C000ED006 /* ViewFactory.swift */,
 				D61546752BA9F61A003E375A /* DrawableButton.swift */,
 				D61546772BAA0866003E375A /* DrawableButtonStack.swift */,
 				D61546832BAA7D5A003E375A /* Settings */,
@@ -409,6 +412,7 @@
 				D61546602BA7D6E0003E375A /* RectangleModel.swift in Sources */,
 				D615467D2BAA730A003E375A /* MainViewController.swift in Sources */,
 				D615466C2BA8989F003E375A /* Opacity.swift in Sources */,
+				D633B9352BBE3B0C000ED006 /* ViewFactory.swift in Sources */,
 				D61546302BA7D07D003E375A /* AppDelegate.swift in Sources */,
 				D61546852BAA7D75003E375A /* BackgroundStack.swift in Sources */,
 				D61546742BA9C13A003E375A /* Plane.swift in Sources */,

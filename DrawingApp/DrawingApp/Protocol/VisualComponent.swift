@@ -8,22 +8,44 @@
 import Foundation
 
 protocol VisualComponent {
-    func getSize() -> Size
-    func getPoint() -> Point
-    func getColor() -> RGBColor?
-    func getUniqueID() -> UniqueID
     func contains(_ point: Point) -> Bool
-    func setOpacity(_ newOpacity: Opacity)
-    func setPoint(_ newPoint: Point)
-    func setSize(_ newSize: Size)
 }
 
-extension VisualComponent where Self: Hashable {
-    static func == (lhs: Self, rhs: Self) -> Bool {
-        return lhs.getUniqueID() == rhs.getUniqueID()
+protocol RectColorful {
+    var backgroundColor: RGBColor { get }
+    func setBackgroundColor(_ newColor: RGBColor)
+}
+
+class BaseRect: Hashable {
+    private(set) var uniqueID: UniqueID
+    private(set) var size: Size
+    private(set) var point: Point
+    private(set) var opacity: Opacity
+    
+    init(uniqueID: UniqueID, size: Size, point: Point, opacity: Opacity) {
+        self.uniqueID = uniqueID
+        self.size = size
+        self.point = point
+        self.opacity = opacity
+    }
+    
+    func setOpacity(_ newOpacity: Opacity) {
+        return self.opacity = newOpacity
+    }
+    
+    func setPoint(_ newPoint: Point) {
+        return self.point = newPoint
+    }
+    
+    func setSize(_ newSize: Size) {
+        return self.size = newSize
+    }
+    
+    static func == (lhs: BaseRect, rhs: BaseRect) -> Bool {
+        return lhs.uniqueID == rhs.uniqueID
     }
     
     func hash(into hasher: inout Hasher) {
-        hasher.combine(getUniqueID())
+        hasher.combine(uniqueID)
     }
 }
