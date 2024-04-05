@@ -7,14 +7,22 @@
 
 import Foundation
 
-class Label: BaseRect, VisualComponent, RectColorful {
+class Label: BaseRect, VisualComponent, RectColorful, ObjectDescription {
     private(set) var text: String
     private(set) var backgroundColor: RGBColor
     
-    init(uniqueID: UniqueID, text: String, point: Point, size: Size, backgroundColor: RGBColor, opacity: Opacity) {
+    init(uniqueID: UniqueID, text: String, point: Point, size: Size, backgroundColor: RGBColor, opacity: Opacity, sequence: Int = 1) {
         self.text = text
         self.backgroundColor = backgroundColor
-        super.init(uniqueID: uniqueID, size: size, point: point, opacity: opacity)
+        super.init(uniqueID: uniqueID, size: size, point: point, opacity: opacity, sequence: sequence)
+    }
+    
+    var titleText: String {
+        return "Text \(sequence)"
+    }
+    
+    var imageName: String {
+        return "textformat"
     }
     
     func contains(_ point: Point) -> Bool {
@@ -31,6 +39,6 @@ class Label: BaseRect, VisualComponent, RectColorful {
 
 extension Label: CustomStringConvertible {
     var description: String {
-        return "(\(self.hashValue)), X:\(point.x),Y:\(point.y), W\(size.width), H:\(size.height), R:\(backgroundColor.red), G:\(backgroundColor.green), B:\(backgroundColor.blue), Alpha: \(opacity.rawValue), text: \(text)"
+        return "(\(self.hashValue)), X:\(point.x),Y:\(point.y), W\(size.width), H:\(size.height), R:\(backgroundColor.red), G:\(backgroundColor.green), B:\(backgroundColor.blue), Alpha: \(opacity.rawValue), text: \(text), sequence: \(sequence)"
     }
 }

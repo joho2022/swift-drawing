@@ -40,6 +40,7 @@
 		D633B9272BB6819F000ED006 /* Label.swift in Sources */ = {isa = PBXBuildFile; fileRef = D633B9262BB6819F000ED006 /* Label.swift */; };
 		D633B92E2BBBD410000ED006 /* LabelFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = D633B92D2BBBD410000ED006 /* LabelFactory.swift */; };
 		D633B9352BBE3B0C000ED006 /* ViewFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = D633B9342BBE3B0C000ED006 /* ViewFactory.swift */; };
+		D633B9372BBF95D6000ED006 /* ListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D633B9362BBF95D6000ED006 /* ListViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -96,6 +97,7 @@
 		D633B9262BB6819F000ED006 /* Label.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Label.swift; sourceTree = "<group>"; };
 		D633B92D2BBBD410000ED006 /* LabelFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabelFactory.swift; sourceTree = "<group>"; };
 		D633B9342BBE3B0C000ED006 /* ViewFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewFactory.swift; sourceTree = "<group>"; };
+		D633B9362BBF95D6000ED006 /* ListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -153,6 +155,7 @@
 				D633B9342BBE3B0C000ED006 /* ViewFactory.swift */,
 				D61546752BA9F61A003E375A /* DrawableButton.swift */,
 				D61546772BAA0866003E375A /* DrawableButtonStack.swift */,
+				D633B9382BBF95DF000ED006 /* Table */,
 				D61546832BAA7D5A003E375A /* Settings */,
 				D633B92C2BBBC0FF000ED006 /* LabelModel */,
 				D633B9152BB15067000ED006 /* PhotoModel */,
@@ -252,6 +255,14 @@
 				D633B92D2BBBD410000ED006 /* LabelFactory.swift */,
 			);
 			path = LabelModel;
+			sourceTree = "<group>";
+		};
+		D633B9382BBF95DF000ED006 /* Table */ = {
+			isa = PBXGroup;
+			children = (
+				D633B9362BBF95D6000ED006 /* ListViewController.swift */,
+			);
+			path = Table;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -396,6 +407,7 @@
 				D633B92E2BBBD410000ED006 /* LabelFactory.swift in Sources */,
 				D615466E2BA92ECF003E375A /* IDGenerator.swift in Sources */,
 				D61546762BA9F61A003E375A /* DrawableButton.swift in Sources */,
+				D633B9372BBF95D6000ED006 /* ListViewController.swift in Sources */,
 				D633B9252BB511E5000ED006 /* StepperStack.swift in Sources */,
 				D615467F2BAA734E003E375A /* SettingsPanelViewController.swift in Sources */,
 				D61546722BA952D3003E375A /* ClampedRGB.swift in Sources */,

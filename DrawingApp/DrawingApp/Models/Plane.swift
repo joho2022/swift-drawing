@@ -9,13 +9,10 @@ import Foundation
 import os
 
 extension Notification.Name {
-    static let labelCreated = Notification.Name("Plane.labelCreated")
-    static let rectangleCreated = Notification.Name("Plane.rectangleCreated")
     static let rectangleColorChanged = Notification.Name("Plane.rectangleColorChanged")
     static let opacityChanged = Notification.Name("Plane.opacityChanged")
     static let pointUpdated = Notification.Name("Plane.pointUpdated")
     static let sizeUpdated = Notification.Name("Plane.sizeUpdate")
-    static let photoSelected = Notification.Name("Plane.photoSelected")
     static let photoOpacityChanged = Notification.Name("Plane.photoOpacityChanged")
 }
 

@@ -16,17 +16,25 @@ protocol RectColorful {
     func setBackgroundColor(_ newColor: RGBColor)
 }
 
+protocol ObjectDescription {
+    var uniqueID : UniqueID { get }
+    var titleText : String { get }
+    var imageName : String { get }
+}
+
 class BaseRect: Hashable {
     private(set) var uniqueID: UniqueID
     private(set) var size: Size
     private(set) var point: Point
     private(set) var opacity: Opacity
+    private(set) var sequence: Int
     
-    init(uniqueID: UniqueID, size: Size, point: Point, opacity: Opacity) {
+    init(uniqueID: UniqueID, size: Size, point: Point, opacity: Opacity, sequence: Int = 1) {
         self.uniqueID = uniqueID
         self.size = size
         self.point = point
         self.opacity = opacity
+        self.sequence = sequence
     }
     
     func setOpacity(_ newOpacity: Opacity) {

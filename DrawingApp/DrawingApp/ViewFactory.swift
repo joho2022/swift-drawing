@@ -8,6 +8,12 @@
 import UIKit
 import os
 
+extension Notification.Name {
+    static let rectangleCreated = Notification.Name("ViewFactory.rectangleCreated")
+    static let photoSelected = Notification.Name("ViewFactory.photoSelected")
+    static let labelCreated = Notification.Name("ViewFactory.labelCreated")
+}
+
 enum ViewFactory {
     static func createRectangleView(_ data: RectangleModel) {
         let rectModel = data

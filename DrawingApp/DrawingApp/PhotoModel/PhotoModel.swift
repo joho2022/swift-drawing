@@ -7,12 +7,20 @@
 
 import Foundation
 
-class PhotoModel: BaseRect, VisualComponent  {
+class PhotoModel: BaseRect, VisualComponent, ObjectDescription  {
     private(set) var imageData: Data
     
-    init(uniqueID: UniqueID, imageData: Data, size: Size, point: Point, opacity: Opacity) {
+    init(uniqueID: UniqueID, imageData: Data, size: Size, point: Point, opacity: Opacity, sequence: Int = 1) {
         self.imageData = imageData
-        super.init(uniqueID: uniqueID, size: size, point: point, opacity: opacity)
+        super.init(uniqueID: uniqueID, size: size, point: point, opacity: opacity, sequence: sequence)
+    }
+    
+    var titleText: String {
+        return "Photo \(self.sequence)"
+    }
+    
+    var imageName: String {
+        return "photo"
     }
     
     func getUniqueID() -> UniqueID {
@@ -29,7 +37,7 @@ class PhotoModel: BaseRect, VisualComponent  {
 
 extension PhotoModel: CustomStringConvertible {
     var description: String {
-        return "(\(uniqueID.value)), imageData:\(imageData) X:\(point.x),Y:\(point.y), W\(size.width), H:\(size.height), Alpha: \(opacity.rawValue)"
+        return "(\(uniqueID.value)), imageData:\(imageData) X:\(point.x),Y:\(point.y), W\(size.width), H:\(size.height), Alpha: \(opacity.rawValue), sequence: \(sequence)"
     }
 }
 

@@ -13,9 +13,10 @@ protocol RectangleModelFactoryProtocol {
 
 class RectangleFactory: RectangleModelFactoryProtocol {
     private let idGenerator = IDGenerator()
-    
+    var sequence = 0
     func createRectangleModel(size: Size, point: Point, backgroundColor: RGBColor, opacity: Opacity) -> RectangleModel {
         let uniqueID = idGenerator.generateUniqueRandomID()
-        return RectangleModel(uniqueID: uniqueID, size: size, point: point, backgroundColor: backgroundColor, opacity: opacity)
+        sequence += 1
+        return RectangleModel(uniqueID: uniqueID, size: size, point: point, backgroundColor: backgroundColor, opacity: opacity, sequence: sequence)
     }
 }

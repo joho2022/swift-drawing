@@ -15,6 +15,7 @@ class MainViewController: UIViewController {
     private var selectedView: UIView?
     private var temporaryView: UIView?
     
+    private var orderedComponents: [BaseRect] = []
     private var viewRegistry: [BaseRect: UIView] = [:]
     private var plane: Plane!
     private var factory: RectangleFactory!
@@ -23,11 +24,11 @@ class MainViewController: UIViewController {
     
     private let drawableButtonStack = DrawableButtonStack()
     private let settingsPanelViewController = SettingsPanelViewController()
+    private let listViewController = ListViewController()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        let settingsFrame = view.bounds.with(width: 200)
-        addChild(settingsPanelViewController, settingsFrame)
+        addChild()
         setupGesture()
         setupOpacityAction()
         setupBackgroundAction()
@@ -44,11 +45,34 @@ class MainViewController: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(handleSizeChanged(notification:)), name: .sizeChanged, object: nil)
     }
     
-    private func addChild(_ child: UIViewController, _ frame: CGRect) {
-        addChild(child)
-        child.view.frame = frame
-        view.addSubview(child.view)
-        child.didMove(toParent: self)
+    private func addChild() {
+        
+        let width: CGFloat = 200
+        
+        addChild(settingsPanelViewController)
+        view.addSubview(settingsPanelViewController.view)
+        settingsPanelViewController.didMove(toParent: self)
+        
+        settingsPanelViewController.view.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            settingsPanelViewController.view.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            settingsPanelViewController.view.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            settingsPanelViewController.view.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+            settingsPanelViewController.view.widthAnchor.constraint(equalToConstant: width)
+        ])
+        
+       
+        addChild(listViewController)
+        view.addSubview(listViewController.view)
+        listViewController.didMove(toParent: self)
+        
+        listViewController.view.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            listViewController.view.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            listViewController.view.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            listViewController.view.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            listViewController.view.widthAnchor.constraint(equalToConstant: width)
+        ])
     }
     
     func injectDependencies(plane: Plane, rectangleFactory: RectangleFactory, photoFactory: PhotoFactory, labelFactory: LabelFactory) {
@@ -56,6 +80,10 @@ class MainViewController: UIViewController {
         self.factory = rectangleFactory
         self.photoFactory = photoFactory
         self.textFactory = labelFactory
+    }
+    
+    private func updateComponentsListView() {
+        listViewController.updateData(orderedComponents)
     }
 }
 
@@ -112,8 +140,10 @@ extension MainViewController {
               let rectView = userInfo["rectView"] as? UIView else { return }
         
         logger.info("사각형 생성 수신완료!!")
+        orderedComponents.append(rectModel)
         addViews(for: rectView, with: rectModel)
         view.bringSubviewToFront(drawableButtonStack)
+        updateComponentsListView()
     }
     
     @objc private func handleCreateLabel(notification: Notification) {
@@ -122,8 +152,10 @@ extension MainViewController {
               let labelView = userInfo["labelView"] as? UILabel else { return }
         
         logger.info("텍스트 생성 수신완료!!")
+        orderedComponents.append(labelModel)
         addViews(for: labelView, with: labelModel)
         view.bringSubviewToFront(drawableButtonStack)
+        updateComponentsListView()
     }
     
     @objc private func handleColorChanged(notification: Notification) {
@@ -263,7 +295,9 @@ extension MainViewController: UIImagePickerControllerDelegate, UINavigationContr
               let photoModel = userInfo["photoModel"] as? PhotoModel,
               let photoView = userInfo["photoView"] as? UIView else { return }
         
+        orderedComponents.append(photoModel)
         addViews(for: photoView, with: photoModel)
+        updateComponentsListView()
     }
     
     @objc private func textButtonTapped() {
