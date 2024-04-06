@@ -43,6 +43,7 @@ class MainViewController: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(handleSizeUpdate(notification:)), name: .sizeUpdated, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(handlePositionChanged(notification:)), name: .positionChanged, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(handleSizeChanged(notification:)), name: .sizeChanged, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(componentSelected(notification:)), name: .componentSelected, object: nil)
     }
     
     private func addChild() {
@@ -103,6 +104,13 @@ extension MainViewController {
         drawableButtonStack.setPhotoButtonAction(#selector(photoButtonTapped), target: self)
         
         drawableButtonStack.setTextButtonAction(#selector(textButtonTapped), target: self)
+    }
+    
+    @objc func componentSelected(notification: Notification) {
+        guard let selectedUniqueID = notification.userInfo?["selectedUniqueID"] as? UniqueID else { return }
+        
+        let selectedComponent = plane.hasComponent(at: selectedUniqueID)
+        selectComponent(selectedComponent)
     }
     
     @objc private func rectangleButtonTapped() {
@@ -393,14 +401,8 @@ extension MainViewController: UIGestureRecognizerDelegate {
         }
     }
     
-    @objc func viewTapped(_ sender: UITapGestureRecognizer) {
-        let newX = sender.location(in: view).x
-        let newY = sender.location(in: view).y
-        
-        let selectedPoint = Point(x: newX, y: newY)
-        let selectedComponent = plane.hasComponent(at: selectedPoint)
+    private func selectComponent(_ selectedComponent: BaseRect?) {
         viewRegistry.forEach { $0.value.layer.borderWidth = 0 }
-        
         if let component = selectedComponent, let view = findView(for: component) {
             selectedView = view
             selectedView?.layer.borderWidth = 4
@@ -411,6 +413,27 @@ extension MainViewController: UIGestureRecognizerDelegate {
             selectedView = nil
             settingsPanelViewController.updateUIForSelectedComponent(nil)
         }
+    }
+    
+    @objc func viewTapped(_ sender: UITapGestureRecognizer) {
+        let newX = sender.location(in: view).x
+        let newY = sender.location(in: view).y
+        
+        let selectedPoint = Point(x: newX, y: newY)
+        let selectedComponent = plane.hasComponent(at: selectedPoint)
+        selectComponent(selectedComponent)
+//        viewRegistry.forEach { $0.value.layer.borderWidth = 0 }
+//        
+//        if let component = selectedComponent, let view = findView(for: component) {
+//            selectedView = view
+//            selectedView?.layer.borderWidth = 4
+//            selectedView?.layer.borderColor = UIColor.blue.cgColor
+//            settingsPanelViewController.updateUIForSelectedComponent(component)
+//            
+//        } else {
+//            selectedView = nil
+//            settingsPanelViewController.updateUIForSelectedComponent(nil)
+//        }
     }
    
     @objc func handlePositionChanged(notification: Notification) {

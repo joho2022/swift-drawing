@@ -119,6 +119,18 @@ extension Plane {
             return nil
         }
     }
+    
+    func hasComponent(at uniqueID: UniqueID) -> BaseRect? {
+        if let rect = rectangles.first(where: { $0.uniqueID == uniqueID }) {
+            return rect
+        } else if let photo = photos.first(where: { $0.uniqueID == uniqueID }) {
+            return photo
+        } else if let label = labels.first(where: { $0.uniqueID == uniqueID }) {
+            return label
+        } else {
+            return nil
+        }
+    }
 
     mutating func addPhoto(_ photo: PhotoModel) {
         return photos.append(photo)

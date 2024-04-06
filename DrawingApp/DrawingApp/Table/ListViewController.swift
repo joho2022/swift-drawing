@@ -8,6 +8,10 @@
 import Foundation
 import UIKit
 
+extension Notification.Name {
+    static let componentSelected = Notification.Name("ListViewController.componentSelected")
+}
+
 class ListViewController: UIViewController {
     var tableView: UITableView!
     var components: [BaseRect] = []
@@ -15,6 +19,9 @@ class ListViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupTableView()
+        
+        let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress(_:)))
+        tableView.addGestureRecognizer(longPressGesture)
     }
     
     func updateData(_ data: [BaseRect]) {
@@ -39,6 +46,15 @@ class ListViewController: UIViewController {
             tableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
         ])
     }
+    
+    @objc func handleLongPress(_ gestureRecognizer: UILongPressGestureRecognizer) {
+        if gestureRecognizer.state == .began {
+            let touchPoint = gestureRecognizer.location(in: tableView)
+            if let indexPath = tableView.indexPathForRow(at: touchPoint) {
+                presentContextMenu(forRowAt: indexPath)
+            }
+        }
+    }
 }
 
 extension ListViewController: UITableViewDataSource {
@@ -57,10 +73,7 @@ extension ListViewController: UITableViewDataSource {
         }
         cell.backgroundColor = .systemGray5
         cell.contentConfiguration = content
-        
-        let interaction = UIContextMenuInteraction(delegate: self)
-        cell.addInteraction(interaction)
-        
+    
         return cell
     }
 }
@@ -85,32 +98,52 @@ extension ListViewController: UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let selectedComponent = components[indexPath.row]
+        let selectedUniqueID = components[indexPath.row].uniqueID
+        print("selectedUniqueID: \(selectedUniqueID)")
+        
+        NotificationCenter.default.post(name: .componentSelected, object: nil, userInfo: ["selectedUniqueID": selectedUniqueID])
     }
 }
 
-extension ListViewController: UIContextMenuInteractionDelegate {
-    func contextMenuInteraction(_ interaction: UIContextMenuInteraction, configurationForMenuAtLocation location: CGPoint) -> UIContextMenuConfiguration? {
-        guard let cell = interaction.view as? UITableViewCell,
-              let indexPath = tableView.indexPath(for: cell) else {
-            return nil
+extension ListViewController {
+    func presentContextMenu(forRowAt indexPath: IndexPath) {
+        let alertController = UIAlertController(title: nil, message: "Choose Option", preferredStyle: .actionSheet)
+        
+        let sendToBackAction = UIAlertAction(title: "맨 뒤로 보내기", style: .default) { [weak self] _ in
+            self?.sendToBack(at: indexPath)
+        }
+        alertController.addAction(sendToBackAction)
+
+        let moveBackwardAction = UIAlertAction(title: "뒤로 보내기", style: .default) { [weak self] _ in
+            self?.moveBackward(at: indexPath)
+        }
+        alertController.addAction(moveBackwardAction)
+
+        let moveForwardAction = UIAlertAction(title: "앞으로 보내기", style: .default) { [weak self] _ in
+            self?.moveForward(at: indexPath)
+        }
+        alertController.addAction(moveForwardAction)
+
+        let bringToFrontAction = UIAlertAction(title: "맨 앞으로 보내기", style: .default) { [weak self] _ in
+            self?.bringToFront(at: indexPath)
+        }
+        alertController.addAction(bringToFrontAction)
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
+        alertController.addAction(cancelAction)
+        
+        if let popoverController = alertController.popoverPresentationController {
+            if let cell = tableView.cellForRow(at: indexPath) {
+                popoverController.sourceView = cell
+                popoverController.sourceRect = cell.bounds
+            } else {
+                popoverController.sourceView = self.view
+                popoverController.sourceRect = CGRect(x: self.view.bounds.midX, y: self.view.bounds.midY, width: 0, height: 0)
+                popoverController.permittedArrowDirections = []
+            }
         }
 
-        return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { _ in
-            let moveToBack = UIAction(title: "맨 뒤로 보내기", image: UIImage(systemName: "arrow.up.to.line.alt")) { _ in
-                self.sendToBack(at: indexPath)
-            }
-            let moveBackward = UIAction(title: "뒤로 보내기", image: UIImage(systemName: "arrow.up")) { _ in
-                self.moveBackward(at: indexPath)
-            }
-            let moveForward = UIAction(title: "앞으로 보내기", image: UIImage(systemName: "arrow.down")) { _ in
-                self.moveForward(at: indexPath)
-            }
-            let bringToFront = UIAction(title: "맨 앞으로 보내기", image: UIImage(systemName: "arrow.down.to.line.alt")) { _ in
-                self.bringToFront(at: indexPath)
-            }
-            return UIMenu(title: "", children: [moveToBack, moveBackward, moveForward, bringToFront])
-        }
+        present(alertController, animated: true, completion: nil)
     }
     
     func sendToBack(at indexPath: IndexPath) {
@@ -141,4 +174,3 @@ extension ListViewController: UIContextMenuInteractionDelegate {
         tableView.moveRow(at: indexPath, to: IndexPath(row: components.count - 1, section: 0))
     }
 }
-
